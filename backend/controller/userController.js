@@ -1,5 +1,8 @@
+const upload = require('../middleware/uploadImage');
 const User = require('../model/user');
 const bcrypt = require('bcrypt');
+const path = require('path');
+const fs = require('fs');
 
 const addUser = async (req, res) => {
     const { name, email, password } = req.body;
@@ -19,7 +22,7 @@ const addUser = async (req, res) => {
 
 const getAllUsers = async (req, res) => {
     try {
-        const users = await User.find();
+        const users = await User.find({}, { password: 0 });
         res.status(200).json({ users });
     } catch (error) {
         res.status(500).json({ message: "Error fetching users", error });
@@ -39,13 +42,13 @@ const updateUser = async (req, res) => {
         }
 
         // update user details
-        if(name){
+        if (name) {
             user.name = name;
         }
-        if(email){
+        if (email) {
             user.email = email;
         }
-        if(password){
+        if (password) {
             user.password = bcrypt.hash(password, 10);
         }
 
@@ -69,9 +72,38 @@ const deleteUser = async (req, res) => {
     }
 };
 
+const updateUserProfilePicture = async (req, res) => {
+    const { id } = req.params;
+    req.folderName = 'profile_pictures';
+    try {
+        const user = await User.findById(id);
+        if (!user) {
+            return res.status(404).json({ message: "User not found" });
+        }
+
+        upload.single('profilePicture')(req, res, async (err) => {
+            if (err) {
+                return res.status(400).json({ message: "Error uploading file", error: err.message });
+            } else {
+                // delete previous file if the file name is not profile_picture/default.jpg
+                const previousFile = user.profilePicture;
+                if (previousFile && previousFile !== 'profile_pictures/default.jpg') {
+                    fs.unlinkSync(path.join('public', previousFile));
+                }
+            }
+            user.profilePicture = path.join(req.folderName, req.file.filename);
+            await user.save();
+            res.status(200).json({ message: "Profile picture updated successfully", user });
+        });
+    } catch (error) {
+        res.status(500).json({ message: "Error updating profile picture", error });
+    }
+};
+
 module.exports = {
     addUser,
     getAllUsers,
     updateUser,
-    deleteUser
+    deleteUser,
+    updateUserProfilePicture
 };
