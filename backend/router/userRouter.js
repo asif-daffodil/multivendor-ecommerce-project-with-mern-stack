@@ -7,6 +7,6 @@ router.post("/add", checkAdmin, addUser);
 router.get("/all", checkAdmin, getAllUsers);
 router.put("/update/:id", checkAuth, updateUser);
 router.delete("/delete/:id", checkAuth, deleteUser);
-router.patch("/profile_picture/:id", checkAuth, updateUserProfilePicture);
+router.patch("/profile-picture/:id", checkAuth, updateUserProfilePicture);
 
 module.exports = router;
