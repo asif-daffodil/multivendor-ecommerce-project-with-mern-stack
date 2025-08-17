@@ -3,6 +3,8 @@ import { useForm } from "react-hook-form";
 import { useMutation } from "@tanstack/react-query";
 import axios from "axios";
 import Swal from 'sweetalert2'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faEnvelope, faLock } from '@fortawesome/free-solid-svg-icons';
 import { useNavigate } from 'react-router';
 import useAuthStore from '../store/useAuthStore';
 
@@ -49,27 +51,38 @@ const SignIn = () => {
 
                 <div className="mb-4">
                     <label className="block text-gray-700 mb-1">Email</label>
-                    <input
-                        type="email"
-                        {...register("email", { required: "Email is required", pattern: { value: /^\S+@\S+$/i, message: "Invalid email address" } })}
-                        className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring focus:ring-blue-300"
-                    />
+                    <div className="relative">
+                        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <FontAwesomeIcon icon={faEnvelope} className="text-gray-400" />
+                        </div>
+                        <input
+                            type="email"
+                            {...register("email", { required: "Email is required", pattern: { value: /^\S+@\S+$/i, message: "Invalid email address" } })}
+                            className="w-full pl-10 px-4 py-2 border rounded-lg focus:outline-none focus:ring focus:ring-blue-300"
+                        />
+                    </div>
                     {errors.email && <p className="text-red-500 text-sm">{errors.email.message}</p>}
                 </div>
 
                 <div className="mb-6">
                     <label className="block text-gray-700 mb-1">Password</label>
-                    <input
-                        type="password"
-                        {...register("password", { required: "Password is required" })}
-                        className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring focus:ring-blue-300"
-                    />
+                    <div className="relative">
+                        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <FontAwesomeIcon icon={faLock} className="text-gray-400" />
+                        </div>
+                        <input
+                            type="password"
+                            {...register("password", { required: "Password is required" })}
+                            className="w-full pl-10 px-4 py-2 border rounded-lg focus:outline-none focus:ring focus:ring-blue-300"
+                        />
+                    </div>
                     {errors.password && <p className="text-red-500 text-sm">{errors.password.message}</p>}
                 </div>
 
                 <button type="submit" disabled={mutation.isLoading} className="w-full bg-blue-500 text-white py-2 rounded-lg hover:bg-blue-600 transition">
                     {mutation.isLoading ? 'Signing in...' : 'Sign In'}
                 </button>
+                
 
                 <p className="mt-4 text-center text-sm text-gray-600">Don't have an account? <a className="text-blue-600" href="/sign-up">Sign up</a></p>
             </form>

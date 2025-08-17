@@ -1,37 +1,61 @@
-import {create} from 'zustand';
-import { Cookies } from 'react-cookie';
+import { create } from 'zustand';
+import axios from 'axios';
 
-const cookies = new Cookies();
+// Initialize state from localStorage (more reliable across reloads)
+const tokenFromStorage = (() => {
+  try { return localStorage.getItem('token') || null } catch { return null }
+})();
+const roleFromStorage = (() => {
+  try { return localStorage.getItem('role') || null } catch { return null }
+})();
+const userFromStorage = (() => {
+  try {
+    const raw = localStorage.getItem('user');
+    return raw ? JSON.parse(raw) : null;
+  } catch {
+    return null;
+  }
+})();
 
-// Initialize state from cookies if present
-const tokenFromCookie = cookies.get('token') || null;
-const roleFromCookie = cookies.get('role') || null;
-let userFromCookie = null;
-try {
-  const raw = cookies.get('user');
-  if (raw) userFromCookie = JSON.parse(raw);
-} catch {
-  userFromCookie = null;
+if (tokenFromStorage) {
+  axios.defaults.headers.common['Authorization'] = `Bearer ${tokenFromStorage}`;
 }
 
 const useAuthStore = create((set) => ({
-  token: tokenFromCookie,
-  role: roleFromCookie,
-  user: userFromCookie,
-  isLoggedIn: !!tokenFromCookie,
+  token: tokenFromStorage,
+  role: roleFromStorage,
+  user: userFromStorage,
+  isLoggedIn: !!tokenFromStorage,
 
   setAuth: ({ token, role, user }) => {
-    if (token) cookies.set('token', token, { path: '/', sameSite: 'lax' });
-    if (role) cookies.set('role', role, { path: '/', sameSite: 'lax' });
-    if (user) cookies.set('user', JSON.stringify(user), { path: '/', sameSite: 'lax' });
+    try {
+      if (token) localStorage.setItem('token', token);
+      else localStorage.removeItem('token');
+
+      if (role) localStorage.setItem('role', role);
+      else localStorage.removeItem('role');
+
+      if (user) localStorage.setItem('user', JSON.stringify(user));
+      else localStorage.removeItem('user');
+    } catch {
+      // ignore storage errors
+    }
+
+    if (token) axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+    else delete axios.defaults.headers.common['Authorization'];
 
     set({ token: token || null, role: role || null, user: user || null, isLoggedIn: !!token });
   },
 
   clearAuth: () => {
-    cookies.remove('token', { path: '/' });
-    cookies.remove('role', { path: '/' });
-    cookies.remove('user', { path: '/' });
+    try {
+      localStorage.removeItem('token');
+      localStorage.removeItem('role');
+      localStorage.removeItem('user');
+    } catch {
+      // ignore
+    }
+    delete axios.defaults.headers.common['Authorization'];
     set({ token: null, role: null, user: null, isLoggedIn: false });
   },
 }));
