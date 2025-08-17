@@ -1,9 +1,10 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { useMutation } from "@tanstack/react-query";
 import axios from "axios";
 import Swal from 'sweetalert2'
 import useAuthStore from '../store/useAuthStore';
+import { useNavigate } from 'react-router';
 
 const SignUp = () => {
     // React Hook Form setup
@@ -13,6 +14,13 @@ const SignUp = () => {
         watch,
         formState: { errors },
     } = useForm();
+
+    const navigate = useNavigate();
+    const isLoggedIn = useAuthStore((s) => s.isLoggedIn);
+
+    useEffect(() => {
+        if (isLoggedIn) navigate('/');
+    }, [isLoggedIn, navigate]);
 
     // TanStack Query mutation for registration
         const setAuth = useAuthStore((s) => s.setAuth);
@@ -32,6 +40,13 @@ const SignUp = () => {
                     axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
                 }
                 setAuth({ token, role, user });
+            Swal.fire({
+                icon: 'success',
+                title: 'Registration successful',
+                text: 'You have been registered successfully!',
+            }).then(() => {
+                navigate('/');
+            });
         },
         onError: (error) => {
             Swal.fire({
