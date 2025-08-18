@@ -31,6 +31,15 @@ const Navbar = () => {
         navigate('/');
     };
 
+    const API_BASE = 'http://localhost:4000'
+    const resolveImage = (path) => {
+        if (!path) return null
+        if (path.startsWith('http://') || path.startsWith('https://')) return path
+        if (path.startsWith('/')) return `${API_BASE}${path}`
+        return `${API_BASE}/${path}`
+    }
+    const avatarSrc = resolveImage(user?.profilePicture)
+
     return (
         <nav className="bg-white border-b relative z-50 dark:bg-black dark:border-gray-700">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -63,7 +72,7 @@ const Navbar = () => {
                                 <div className="relative ml-4" ref={userMenuRef}>
                                     <button onClick={() => setUserMenuOpen((s) => !s)} className="flex items-center text-sm rounded-full focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
                                         {user?.profilePicture ? (
-                                            <img src={`http://localhost:4000/${user.profilePicture}`} alt="avatar" className="h-8 w-8 rounded-full" />
+                                            <img src={avatarSrc} alt="avatar" className="h-8 w-8 rounded-full" onError={(e)=>{ e.currentTarget.onerror = null; e.currentTarget.src = '/vite.svg' }} />
                                         ) : (
                                             <FontAwesomeIcon icon={faUserCircle} className="h-8 w-8 text-gray-500 dark:text-gray-300" />
                                         )}

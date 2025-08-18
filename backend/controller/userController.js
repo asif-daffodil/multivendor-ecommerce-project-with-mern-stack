@@ -114,11 +114,46 @@ const updateUserProfilePicture = async (req, res) => {
     }
 };
 
+const changePassword = async (req, res) => {
+    const { id } = req.params;
+    const { currentPassword, newPassword } = req.body;
+
+    if (!newPassword) {
+        return res.status(400).json({ message: "New password is required" });
+    }
+
+    try {
+        const user = await User.findById(id);
+        if (!user) {
+            return res.status(404).json({ message: "User not found" });
+        }
+
+        // If requester is not admin, require currentPassword and verify it
+        if (req.user?.role !== 'admin') {
+            if (!currentPassword) {
+                return res.status(400).json({ message: "Current password is required" });
+            }
+            const isMatch = await bcrypt.compare(currentPassword, user.password);
+            if (!isMatch) {
+                return res.status(401).json({ message: "Current password is incorrect" });
+            }
+        }
+
+        user.password = await bcrypt.hash(newPassword, 10);
+        user.updatedAt = Date.now();
+        await user.save();
+        res.status(200).json({ message: "Password changed successfully" });
+    } catch (error) {
+        res.status(500).json({ message: "Error changing password", error });
+    }
+};
+
 module.exports = {
     addUser,
     getAllUsers,
     getUserById,
     updateUser,
     deleteUser,
-    updateUserProfilePicture
+    updateUserProfilePicture,
+    changePassword
 };
