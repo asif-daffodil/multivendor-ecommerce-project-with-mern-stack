@@ -29,11 +29,25 @@ const getAllUsers = async (req, res) => {
     }
 };
 
+const getUserById = async (req, res) => {
+    const { id } = req.params;
+    try {
+        const user = await User.findById(id, { password: 0 });
+        if (!user) {
+            return res.status(404).json({ message: "User not found" });
+        }
+        res.status(200).json({ user });
+    } catch (error) {
+        res.status(500).json({ message: "Error fetching user", error });
+    }
+};
+
 const updateUser = async (req, res) => {
     const { id } = req.params;
     const name = req.body.name ?? null;
     const email = req.body.email ?? null;
     const password = req.body.password ?? null;
+
     try {
         // check user is available or not
         const user = await User.findById(id);
@@ -103,6 +117,7 @@ const updateUserProfilePicture = async (req, res) => {
 module.exports = {
     addUser,
     getAllUsers,
+    getUserById,
     updateUser,
     deleteUser,
     updateUserProfilePicture

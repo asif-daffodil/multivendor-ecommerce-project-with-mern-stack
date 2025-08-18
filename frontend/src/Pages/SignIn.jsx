@@ -45,20 +45,20 @@ const SignIn = () => {
     const onSubmit = (data) => mutation.mutate(data);
 
     return (
-        <div className="flex justify-center items-center min-h-screen bg-gray-100">
-            <form onSubmit={handleSubmit(onSubmit)} className="bg-white p-8 rounded-lg shadow-lg w-full max-w-md">
-                <h2 className="text-2xl font-bold mb-6 text-center text-gray-800">Sign In</h2>
+        <div className="flex justify-center items-center min-h-screen bg-gray-100 dark:bg-gray-900">
+            <form onSubmit={handleSubmit(onSubmit)} className="bg-white dark:bg-gray-800 dark:text-white p-8 rounded-lg shadow-lg w-full max-w-md">
+                <h2 className="text-2xl font-bold mb-6 text-center text-gray-800 dark:text-white">Sign In</h2>
 
                 <div className="mb-4">
                     <label className="block text-gray-700 mb-1">Email</label>
                     <div className="relative">
                         <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                            <FontAwesomeIcon icon={faEnvelope} className="text-gray-400" />
+                            <FontAwesomeIcon icon={faEnvelope} className="text-gray-400 dark:text-gray-300" />
                         </div>
                         <input
                             type="email"
                             {...register("email", { required: "Email is required", pattern: { value: /^\S+@\S+$/i, message: "Invalid email address" } })}
-                            className="w-full pl-10 px-4 py-2 border rounded-lg focus:outline-none focus:ring focus:ring-blue-300"
+                            className="w-full pl-10 px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring focus:ring-blue-300"
                         />
                     </div>
                     {errors.email && <p className="text-red-500 text-sm">{errors.email.message}</p>}
@@ -68,23 +68,23 @@ const SignIn = () => {
                     <label className="block text-gray-700 mb-1">Password</label>
                     <div className="relative">
                         <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                            <FontAwesomeIcon icon={faLock} className="text-gray-400" />
+                            <FontAwesomeIcon icon={faLock} className="text-gray-400 dark:text-gray-300" />
                         </div>
                         <input
                             type="password"
                             {...register("password", { required: "Password is required" })}
-                            className="w-full pl-10 px-4 py-2 border rounded-lg focus:outline-none focus:ring focus:ring-blue-300"
+                            className="w-full pl-10 px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring focus:ring-blue-300"
                         />
                     </div>
                     {errors.password && <p className="text-red-500 text-sm">{errors.password.message}</p>}
                 </div>
 
-                <button type="submit" disabled={mutation.isLoading} className="w-full bg-blue-500 text-white py-2 rounded-lg hover:bg-blue-600 transition">
+                <button type="submit" disabled={mutation.isLoading} className="w-full bg-blue-500 dark:bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-600 dark:hover:bg-blue-700 transition">
                     {mutation.isLoading ? 'Signing in...' : 'Sign In'}
                 </button>
                 
 
-                <p className="mt-4 text-center text-sm text-gray-600">Don't have an account? <a className="text-blue-600" href="/sign-up">Sign up</a></p>
+                <p className="mt-4 text-center text-sm text-gray-600 dark:text-gray-300">Don't have an account? <a className="text-blue-600 dark:text-blue-400" href="/sign-up">Sign up</a></p>
             </form>
         </div>
     );

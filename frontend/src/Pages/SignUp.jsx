@@ -67,22 +67,22 @@ const SignUp = () => {
     };
 
     return (
-        <div className="flex justify-center items-center min-h-screen bg-gray-100">
+        <div className="flex justify-center items-center min-h-screen bg-gray-100 dark:bg-gray-900">
             <form
                 onSubmit={handleSubmit(onSubmit)}
-                className="bg-white p-8 rounded-lg shadow-lg w-full max-w-md"
+                className="bg-white dark:bg-gray-800 dark:text-white p-8 rounded-lg shadow-lg w-full max-w-md"
             >
-                <h2 className="text-2xl font-bold mb-6 text-center text-gray-800">
+                <h2 className="text-2xl font-bold mb-6 text-center text-gray-800 dark:text-white">
                     Register
                 </h2>
 
                 {/* Name */}
                 <div className="mb-4">
-                    <label className="block text-gray-700 mb-1">Name</label>
+                    <label className="block text-gray-700 dark:text-gray-200 mb-1">Name</label>
                     <input
                         type="text"
                         {...register("name", { required: "Name is required" })}
-                        className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring focus:ring-blue-300"
+                        className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring focus:ring-blue-300"
                     />
                     {errors.name && (
                         <p className="text-red-500 text-sm">{errors.name.message}</p>
@@ -91,14 +91,14 @@ const SignUp = () => {
 
                 {/* Email */}
                 <div className="mb-4">
-                    <label className="block text-gray-700 mb-1">Email</label>
+                    <label className="block text-gray-700 dark:text-gray-200 mb-1">Email</label>
                     <input
                         type="email"
                         {...register("email", {
                             required: "Email is required",
                             pattern: { value: /^\S+@\S+$/i, message: "Invalid email address" },
                         })}
-                        className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring focus:ring-blue-300"
+                        className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring focus:ring-blue-300"
                     />
                     {errors.email && (
                         <p className="text-red-500 text-sm">{errors.email.message}</p>
@@ -107,10 +107,10 @@ const SignUp = () => {
 
                 {/* role user or vendor */}
                 <div className="mb-4">
-                    <label className="block text-gray-700 mb-1">Role</label>
+                    <label className="block text-gray-700 dark:text-gray-200 mb-1">Role</label>
                     <select
                         {...register("role", { required: "Role is required" })}
-                        className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring focus:ring-blue-300"
+                        className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring focus:ring-blue-300"
                     >
                         <option value="">Select a role</option>
                         <option value="user">User</option>
@@ -123,7 +123,7 @@ const SignUp = () => {
 
                 {/* Password */}
                 <div className="mb-4">
-                    <label className="block text-gray-700 mb-1">Password</label>
+                    <label className="block text-gray-700 dark:text-gray-200 mb-1">Password</label>
                     <input
                         type="password"
                         {...register("password", {
@@ -133,7 +133,7 @@ const SignUp = () => {
                                 message: "Password must be at least 6 characters",
                             },
                         })}
-                        className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring focus:ring-blue-300"
+                        className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring focus:ring-blue-300"
                     />
                     {errors.password && (
                         <p className="text-red-500 text-sm">{errors.password.message}</p>
@@ -142,7 +142,7 @@ const SignUp = () => {
 
                 {/* Confirm Password */}
                 <div className="mb-6">
-                    <label className="block text-gray-700 mb-1">Confirm Password</label>
+                    <label className="block text-gray-700 dark:text-gray-200 mb-1">Confirm Password</label>
                     <input
                         type="password"
                         {...register("confirmPassword", {
@@ -150,7 +150,7 @@ const SignUp = () => {
                             validate: (value) =>
                                 value === password || "Passwords do not match",
                         })}
-                        className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring focus:ring-blue-300"
+                        className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring focus:ring-blue-300"
                     />
                     {errors.confirmPassword && (
                         <p className="text-red-500 text-sm">
@@ -163,7 +163,7 @@ const SignUp = () => {
                 <button
                     type="submit"
                     disabled={mutation.isLoading}
-                    className="w-full bg-blue-500 text-white py-2 rounded-lg hover:bg-blue-600 transition"
+                    className="w-full bg-blue-500 dark:bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-600 dark:hover:bg-blue-700 transition"
                 >
                     {mutation.isLoading ? "Registering..." : "Register"}
                 </button>
