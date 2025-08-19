@@ -5,7 +5,7 @@ import axios from "axios";
 import Swal from 'sweetalert2'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEnvelope, faLock } from '@fortawesome/free-solid-svg-icons';
-import { useNavigate } from 'react-router';
+import { useLocation, useNavigate } from 'react-router';
 import useAuthStore from '../store/useAuthStore';
 
 const SignIn = () => {
@@ -13,6 +13,7 @@ const SignIn = () => {
     const setAuth = useAuthStore((s) => s.setAuth);
     const isLoggedIn = useAuthStore((s) => s.isLoggedIn);
     const navigate = useNavigate();
+    const location = useLocation();
 
     useEffect(() => {
         if (isLoggedIn) navigate('/');
@@ -32,7 +33,9 @@ const SignIn = () => {
                 if (token) axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
                 setAuth({ token, role, user });
                 Swal.fire({ icon: 'success', title: 'Login successful', text: res.data?.message || 'Welcome' });
-                navigate('/');
+                const params = new URLSearchParams(location.search);
+                const next = params.get('next') || '/';
+                navigate(next);
             } else {
                 Swal.fire({ icon: 'error', title: 'Login failed', text: res?.data?.message || 'Invalid credentials' });
             }

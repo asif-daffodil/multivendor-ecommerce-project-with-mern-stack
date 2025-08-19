@@ -22,6 +22,7 @@ import VendorProductForm from "./Pages/VendorProductForm";
 import Cart from "./Pages/Cart";
 import ProductDetail from "./Pages/ProductDetail";
 import Products from "./Pages/Products";
+import Checkout from "./Pages/Checkout";
 
 const router = createBrowserRouter([
   {
@@ -43,6 +44,10 @@ const router = createBrowserRouter([
         {
           path: "/cart",
           element: <Cart />
+        },
+        {
+          path: "/checkout",
+          element: <Checkout />
         },
         {
           path: "/sign-up",
