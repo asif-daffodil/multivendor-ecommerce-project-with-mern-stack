@@ -27,6 +27,21 @@ app.use('/user', userRouter);
 const authRouter = require('./router/authRouter');
 app.use('/auth', authRouter);
 
+const categoryRouter = require('./router/categoryRouter');
+app.use('/category', categoryRouter);
+
+const productRouter = require('./router/productRouter');
+app.use('/products', productRouter);
+
+const subCategoryRouter = require('./router/subCategoryRouter');
+app.use('/subcategory', subCategoryRouter);
+
+const brandRouter = require('./router/brandRouter');
+app.use('/brand', brandRouter);
+
+const reviewRouter = require('./router/reviewRouter');
+app.use('/reviews', reviewRouter);
+
 app.listen(4000, () => {
     console.log('Server is running on port 4000');
 })

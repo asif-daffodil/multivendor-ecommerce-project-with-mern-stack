@@ -15,6 +15,7 @@ const DashboardRedirect = () => {
     // Normalize role string
     const r = (role || '').toString().toLowerCase()
     if (r === 'vendor') navigate('/dashboard/vendor')
+    else if (r === 'admin') navigate('/dashboard/admin')
     else navigate('/dashboard/user')
   }, [isLoggedIn, role, navigate])
 

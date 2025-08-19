@@ -12,6 +12,17 @@ import DashboardRedirect from "./Pages/DashboardRedirect";
 import UserDashboard from "./Pages/UserDashboard";
 import VendorDashboard from "./Pages/VendorDashboard";
 
+import AdminDashboard from "./Pages/AdminDashboard";
+import AdminProducts from "./Pages/AdminProducts";
+import AdminCategories from "./Pages/AdminCategories";
+import AdminBrands from "./Pages/AdminBrands";
+import AdminProductForm from "./Pages/AdminProductForm";
+import VendorProducts from "./Pages/VendorProducts";
+import VendorProductForm from "./Pages/VendorProductForm";
+import Cart from "./Pages/Cart";
+import ProductDetail from "./Pages/ProductDetail";
+import Products from "./Pages/Products";
+
 const router = createBrowserRouter([
   {
     path: "/",
@@ -20,6 +31,18 @@ const router = createBrowserRouter([
         {
             path: "/",
             element: <Home />
+        },
+        {
+          path: "/products",
+          element: <Products />
+        },
+        {
+          path: "/products/:id",
+          element: <ProductDetail />
+        },
+        {
+          path: "/cart",
+          element: <Cart />
         },
         {
           path: "/sign-up",
@@ -60,6 +83,45 @@ const router = createBrowserRouter([
         }
         ,
         {
+          path: "/dashboard/vendor/products",
+          element: <VendorProducts />
+        }
+        ,
+        {
+          path: "/dashboard/vendor/products/add",
+          element: <VendorProductForm />
+        }
+        ,
+        {
+          path: "/dashboard/vendor/products/:id/edit",
+          element: <VendorProductForm />
+        }
+        ,
+        {
+          path: "/dashboard/admin",
+          element: <AdminDashboard />
+  },
+        {
+          path: "/admin/products",
+          element: <AdminProducts />
+        },
+        {
+          path: "/admin/products/add",
+          element: <AdminProductForm />
+        },
+        {
+          path: "/admin/products/:id/edit",
+          element: <AdminProductForm />
+        },
+        {
+          path: "/admin/brands",
+          element: <AdminBrands />
+        },
+        {
+          path: "/admin/categories",
+          element: <AdminCategories />
+        },
+  {
           path: "/change-password",
           element: <ChangePassword />
         }
