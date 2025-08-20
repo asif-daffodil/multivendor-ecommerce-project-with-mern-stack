@@ -22,7 +22,9 @@ const checkAuth = async (req, res, next) => {
             res.setHeader('Authorization', `Bearer ${newToken}`);
         }
         req.user = await User.findById(decoded.id);
-        
+        if (req.user?.banned) {
+            return res.status(403).json({ message: 'Account banned' });
+        }
         next();
     } catch (error) {
         if (error.name === "TokenExpiredError") {
@@ -58,7 +60,10 @@ const checkAdmin = async (req, res, next) => {
 
     try {
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
-        req.user = await User.findById(decoded.id);
+            req.user = await User.findById(decoded.id);
+            if (req.user?.banned) {
+                return res.status(403).json({ message: 'Account banned' });
+            }
         if (req.user.role !== 'admin') {
             return res.status(403).json({ message: "Forbidden" });
         }
@@ -95,12 +100,15 @@ const checkVendor = async (req, res, next) => {
         return res.status(401).json({ message: "Unauthorized" });
     }
 
-    try {
+        try {
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
         req.user = await User.findById(decoded.id);
-        if (req.user.role !== 'vendor') {
-            return res.status(403).json({ message: "Forbidden" });
-        }
+            if (req.user?.banned) {
+                return res.status(403).json({ message: 'Account banned' });
+            }
+            if (req.user.role !== 'vendor') {
+                return res.status(403).json({ message: "Forbidden" });
+            }
         next();
     } catch (error) {
         if (error.name === "TokenExpiredError") {

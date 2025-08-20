@@ -9,7 +9,12 @@ const addUser = async (req, res) => {
 
     try {
         const hashedPassword = await bcrypt.hash(password, 10);
-        const user = new User({ name, email, password: hashedPassword });
+        const user = new User({
+            name,
+            email,
+            password: hashedPassword,
+            billingAddress: req.body.billingAddress || null,
+        });
         await user.save();
         res.status(201).json({ message: "User added successfully", user });
     } catch (error) {
@@ -26,6 +31,37 @@ const getAllUsers = async (req, res) => {
         res.status(200).json({ users });
     } catch (error) {
         res.status(500).json({ message: "Error fetching users", error });
+    }
+};
+
+const banUser = async (req, res) => {
+    const { id } = req.params;
+    const { reason } = req.body;
+    try {
+        const user = await User.findById(id);
+        if (!user) return res.status(404).json({ message: 'User not found' });
+        user.banned = true;
+        user.banReason = reason || null;
+        user.bannedAt = Date.now();
+        await user.save();
+        res.json({ message: 'User banned', user });
+    } catch (error) {
+        res.status(500).json({ message: 'Error banning user', error });
+    }
+};
+
+const unbanUser = async (req, res) => {
+    const { id } = req.params;
+    try {
+        const user = await User.findById(id);
+        if (!user) return res.status(404).json({ message: 'User not found' });
+        user.banned = false;
+        user.banReason = null;
+        user.bannedAt = null;
+        await user.save();
+        res.json({ message: 'User unbanned', user });
+    } catch (error) {
+        res.status(500).json({ message: 'Error unbanning user', error });
     }
 };
 
@@ -47,6 +83,7 @@ const updateUser = async (req, res) => {
     const name = req.body.name ?? null;
     const email = req.body.email ?? null;
     const password = req.body.password ?? null;
+    const billingAddress = req.body.billingAddress ?? null;
 
     try {
         // check user is available or not
@@ -63,7 +100,11 @@ const updateUser = async (req, res) => {
             user.email = email;
         }
         if (password) {
-            user.password = bcrypt.hash(password, 10);
+            user.password = await bcrypt.hash(password, 10);
+        }
+
+        if (billingAddress) {
+            user.billingAddress = billingAddress;
         }
 
         await user.save();
@@ -155,5 +196,7 @@ module.exports = {
     updateUser,
     deleteUser,
     updateUserProfilePicture,
-    changePassword
+    changePassword,
+    banUser,
+    unbanUser
 };

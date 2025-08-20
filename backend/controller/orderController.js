@@ -3,8 +3,9 @@ const Product = require('../model/product');
 
 const createOrder = async (req, res) => {
   try {
-    const { items, total, paymentMethod } = req.body;
-    const deliveryAddress = req.body.deliveryAddress;
+    const { items, total, paymentMethod, billingAddress, shippingAddress } = req.body;
+    // shippingAddress is explicit; deliveryAddress kept for backward compatibility
+    const deliveryAddress = shippingAddress || req.body.deliveryAddress || null;
     if (!items || !items.length) return res.status(400).json({ message: 'Cart is empty' });
 
     if (!deliveryAddress || !deliveryAddress.addressLine || !deliveryAddress.city || !deliveryAddress.phone) {
@@ -39,7 +40,9 @@ const createOrder = async (req, res) => {
       items: resolved,
       total: Number(total || resolved.reduce((s, r) => s + (r.price * (r.qty || 1)), 0)),
       paymentMethod: paymentMethod || 'cod',
-  deliveryAddress,
+      deliveryAddress,
+      billingAddress: billingAddress || null,
+      shippingAddress: shippingAddress || deliveryAddress || null,
     });
 
     await order.save();

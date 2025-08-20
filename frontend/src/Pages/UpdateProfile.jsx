@@ -17,12 +17,25 @@ const UpdateProfile = () => {
     const { register, handleSubmit, formState: { errors, isSubmitting }, reset } = useForm({
         defaultValues: {
             name: user?.name || '',
-            email: user?.email || ''
+            email: user?.email || '',
+            billing_fullName: user?.billingAddress?.fullName || '',
+            billing_addressLine: user?.billingAddress?.addressLine || '',
+            billing_city: user?.billingAddress?.city || '',
+            billing_postalCode: user?.billingAddress?.postalCode || '',
+            billing_phone: user?.billingAddress?.phone || '',
         }
     })
 
     React.useEffect(() => {
-        reset({ name: user?.name || '', email: user?.email || '' })
+        reset({
+            name: user?.name || '',
+            email: user?.email || '',
+            billing_fullName: user?.billingAddress?.fullName || '',
+            billing_addressLine: user?.billingAddress?.addressLine || '',
+            billing_city: user?.billingAddress?.city || '',
+            billing_postalCode: user?.billingAddress?.postalCode || '',
+            billing_phone: user?.billingAddress?.phone || '',
+        })
     }, [user, reset])
 
     const mutation = useMutation({
@@ -55,7 +68,23 @@ const UpdateProfile = () => {
         }
     })
 
-    const onSubmit = (vals) => mutation.mutate(vals)
+    const onSubmit = (vals) => {
+        const billing = {
+            fullName: vals.billing_fullName || '',
+            addressLine: vals.billing_addressLine || '',
+            city: vals.billing_city || '',
+            postalCode: vals.billing_postalCode || '',
+            phone: vals.billing_phone || '',
+        }
+
+        const payload = {
+            name: vals.name,
+            email: vals.email,
+            billingAddress: billing,
+        }
+
+        mutation.mutate(payload)
+    }
 
     return (
         <div className="max-w-lg mx-auto p-6">
@@ -71,6 +100,17 @@ const UpdateProfile = () => {
                     <label className="block text-gray-700 dark:text-gray-200 mb-1">Email</label>
                     <input {...register('email', { required: 'Email required', pattern: { value: /^\S+@\S+$/i, message: 'Invalid email' } })} className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-700 text-gray-900 dark:text-white" />
                     {errors.email && <p className="text-red-500 text-sm mt-1">{errors.email.message}</p>}
+                </div>
+
+                <h3 className="text-lg font-semibold mb-2">Billing Address</h3>
+                <div className="mb-3">
+                    <input {...register('billing_fullName')} placeholder="Full name" className="w-full px-3 py-2 border rounded mb-2" />
+                    <input {...register('billing_addressLine')} placeholder="Street address" className="w-full px-3 py-2 border rounded mb-2" />
+                    <div className="grid grid-cols-2 gap-2">
+                        <input {...register('billing_city')} placeholder="City" className="px-3 py-2 border rounded" />
+                        <input {...register('billing_postalCode')} placeholder="Postal code" className="px-3 py-2 border rounded" />
+                    </div>
+                    <input {...register('billing_phone')} placeholder="Phone" className="w-full px-3 py-2 border rounded mt-2" />
                 </div>
 
                 <div className="flex gap-3">

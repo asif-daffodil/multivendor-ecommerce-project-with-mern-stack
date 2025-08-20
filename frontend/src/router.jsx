@@ -16,6 +16,7 @@ import AdminDashboard from "./Pages/AdminDashboard";
 import AdminProducts from "./Pages/AdminProducts";
 import AdminCategories from "./Pages/AdminCategories";
 import AdminBrands from "./Pages/AdminBrands";
+import AdminUsers from "./Pages/AdminUsers";
 import AdminProductForm from "./Pages/AdminProductForm";
 import VendorProducts from "./Pages/VendorProducts";
 import VendorProductForm from "./Pages/VendorProductForm";
@@ -120,6 +121,10 @@ const router = createBrowserRouter([
         {
           path: "/admin/orders",
           element: <AdminOrders />
+        },
+        {
+          path: "/admin/users",
+          element: <AdminUsers />
         },
         {
           path: "/admin/products/add",

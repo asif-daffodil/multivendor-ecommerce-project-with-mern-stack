@@ -27,6 +27,26 @@ const userSchema = new mongoose.Schema({
         type: String,
         default: 'profile_pictures/default.jpg'
     },
+    banned: {
+        type: Boolean,
+        default: false
+    },
+    banReason: { type: String },
+    bannedAt: { type: Date },
+    billingAddress: {
+        fullName: { type: String },
+        addressLine: { type: String },
+        city: { type: String },
+        postalCode: { type: String },
+        phone: { type: String },
+    },
+    shippingAddress: {
+        fullName: { type: String },
+        addressLine: { type: String },
+        city: { type: String },
+        postalCode: { type: String },
+        phone: { type: String },
+    },
     createdAt: {
         type: Date,
         default: Date.now

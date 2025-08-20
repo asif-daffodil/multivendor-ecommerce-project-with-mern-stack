@@ -9,9 +9,19 @@ const Checkout = () => {
   const isLoggedIn = useAuthStore((s) => s.isLoggedIn);
   const items = useCartStore((s) => s.items);
   const getTotalPrice = useCartStore((s) => s.totalPrice);
+  const user = useAuthStore((s) => s.user);
   const navigate = useNavigate();
   const [paymentMethod, setPaymentMethod] = useState('cod');
-  const [deliveryAddress, setDeliveryAddress] = useState({
+  // billing address (required) and shipping address (optional / can be same as billing)
+  const [billingAddress, setBillingAddress] = useState({
+    fullName: '',
+    addressLine: '',
+    city: '',
+    postalCode: '',
+    phone: ''
+  });
+  const [shippingSame, setShippingSame] = useState(true);
+  const [shippingAddress, setShippingAddress] = useState({
     fullName: '',
     addressLine: '',
     city: '',
@@ -25,17 +35,26 @@ const Checkout = () => {
       return;
     }
 
-    // simple client-side validation for address
-    if (!deliveryAddress.fullName || !deliveryAddress.addressLine || !deliveryAddress.city || !deliveryAddress.phone) {
-      Swal.fire('Address incomplete', 'Please provide full name, street address, city and phone.', 'warning');
+    // validation: billing required
+    if (!billingAddress.fullName || !billingAddress.addressLine || !billingAddress.city || !billingAddress.phone) {
+      Swal.fire('Billing address incomplete', 'Please provide full billing name, street address, city and phone.', 'warning');
       return;
+    }
+
+    // shipping validation if not same
+    if (!shippingSame) {
+      if (!shippingAddress.fullName || !shippingAddress.addressLine || !shippingAddress.city || !shippingAddress.phone) {
+        Swal.fire('Shipping address incomplete', 'Please provide full shipping name, street address, city and phone.', 'warning');
+        return;
+      }
     }
 
     const payload = {
       items: items.map((i) => ({ product: i.id, name: i.name, qty: i.qty || 1, price: Number(i.price) })),
       total: getTotalPrice(),
       paymentMethod,
-      deliveryAddress,
+      billingAddress,
+      shippingAddress: shippingSame ? billingAddress : shippingAddress,
     };
 
     try {
@@ -52,6 +71,19 @@ const Checkout = () => {
       Swal.fire('Error', err?.response?.data?.message || err.message || 'Failed to create order', 'error');
     }
   };
+
+  // pre-fill billing address from user profile when available
+  React.useEffect(() => {
+    if (user?.billingAddress) {
+      setBillingAddress({
+        fullName: user.billingAddress.fullName || '',
+        addressLine: user.billingAddress.addressLine || '',
+        city: user.billingAddress.city || '',
+        postalCode: user.billingAddress.postalCode || '',
+        phone: user.billingAddress.phone || '',
+      });
+    }
+  }, [user]);
 
   if (!isLoggedIn) {
     return (
@@ -72,22 +104,47 @@ const Checkout = () => {
         <div className="md:col-span-7">
           <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded p-6 shadow-sm">
             <h2 className="text-xl font-semibold mb-4">Billing details</h2>
-            <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">Enter your billing and delivery address.</p>
+            <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">Enter your billing address. You can use the same address for shipping.</p>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <input value={deliveryAddress.fullName} onChange={(e)=>setDeliveryAddress(s=>({...s, fullName: e.target.value}))} placeholder="Full name" className="p-2 border rounded" />
-              <input value={deliveryAddress.phone} onChange={(e)=>setDeliveryAddress(s=>({...s, phone: e.target.value}))} placeholder="Phone" className="p-2 border rounded" />
+              <input value={billingAddress.fullName} onChange={(e)=>setBillingAddress(s=>({...s, fullName: e.target.value}))} placeholder="Full name" className="p-2 border rounded" />
+              <input value={billingAddress.phone} onChange={(e)=>setBillingAddress(s=>({...s, phone: e.target.value}))} placeholder="Phone" className="p-2 border rounded" />
             </div>
 
             <div className="mt-4">
-              <input value={deliveryAddress.addressLine} onChange={(e)=>setDeliveryAddress(s=>({...s, addressLine: e.target.value}))} placeholder="Street address" className="w-full p-2 border rounded" />
+              <input value={billingAddress.addressLine} onChange={(e)=>setBillingAddress(s=>({...s, addressLine: e.target.value}))} placeholder="Street address" className="w-full p-2 border rounded" />
             </div>
 
             <div className="mt-4 grid grid-cols-1 sm:grid-cols-3 gap-4">
-              <input value={deliveryAddress.city} onChange={(e)=>setDeliveryAddress(s=>({...s, city: e.target.value}))} placeholder="Town / City" className="p-2 border rounded" />
-              <input value={deliveryAddress.postalCode} onChange={(e)=>setDeliveryAddress(s=>({...s, postalCode: e.target.value}))} placeholder="Postcode / ZIP" className="p-2 border rounded" />
+              <input value={billingAddress.city} onChange={(e)=>setBillingAddress(s=>({...s, city: e.target.value}))} placeholder="Town / City" className="p-2 border rounded" />
+              <input value={billingAddress.postalCode} onChange={(e)=>setBillingAddress(s=>({...s, postalCode: e.target.value}))} placeholder="Postcode / ZIP" className="p-2 border rounded" />
               <div className="p-2" />
             </div>
+
+            <div className="mt-4">
+              <label className="inline-flex items-center">
+                <input type="checkbox" checked={shippingSame} onChange={(e)=>setShippingSame(e.target.checked)} className="mr-2" />
+                <span className="text-sm">Shipping address same as billing</span>
+              </label>
+            </div>
+
+            {!shippingSame && (
+              <div className="mt-4 bg-gray-50 dark:bg-gray-800 p-4 rounded">
+                <h4 className="font-medium mb-2">Shipping address</h4>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <input value={shippingAddress.fullName} onChange={(e)=>setShippingAddress(s=>({...s, fullName: e.target.value}))} placeholder="Full name" className="p-2 border rounded" />
+                  <input value={shippingAddress.phone} onChange={(e)=>setShippingAddress(s=>({...s, phone: e.target.value}))} placeholder="Phone" className="p-2 border rounded" />
+                </div>
+                <div className="mt-4">
+                  <input value={shippingAddress.addressLine} onChange={(e)=>setShippingAddress(s=>({...s, addressLine: e.target.value}))} placeholder="Street address" className="w-full p-2 border rounded" />
+                </div>
+                <div className="mt-4 grid grid-cols-1 sm:grid-cols-3 gap-4">
+                  <input value={shippingAddress.city} onChange={(e)=>setShippingAddress(s=>({...s, city: e.target.value}))} placeholder="Town / City" className="p-2 border rounded" />
+                  <input value={shippingAddress.postalCode} onChange={(e)=>setShippingAddress(s=>({...s, postalCode: e.target.value}))} placeholder="Postcode / ZIP" className="p-2 border rounded" />
+                  <div className="p-2" />
+                </div>
+              </div>
+            )}
 
             <div className="mt-6 text-sm text-gray-600 dark:text-gray-400">
               <p>Note: For now we accept Cash on Delivery. You can add other payment methods later.</p>
