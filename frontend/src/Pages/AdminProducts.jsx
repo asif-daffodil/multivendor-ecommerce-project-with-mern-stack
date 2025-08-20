@@ -180,7 +180,7 @@ export default function AdminProducts() {
                     <td className="p-2 border border-gray-200 dark:border-gray-700">{p.name}</td>
                     <td className="p-2 border border-gray-200 dark:border-gray-700">{p.isCompanyProduct ? 'Company' : (p.owner?.name || '-')}{p.owner?.role ? ` (${p.owner.role})` : ''}</td>
                     <td className="p-2 border border-gray-200 dark:border-gray-700">{p.brand?.name || '-'}</td>
-                    <td className="p-2 border border-gray-200 dark:border-gray-700">{p.salePrice ?? p.regularPrice}</td>
+                    <td className="p-2 border border-gray-200 dark:border-gray-700">{'BDT '}{Number(p.salePrice ?? p.regularPrice ?? 0).toFixed(2)}</td>
                     <td className="p-2 border border-gray-200 dark:border-gray-700">{p.outOfStock ? 'Out of stock' : p.inventoryCount}</td>
                     <td className="p-2 border border-gray-200 dark:border-gray-700">{p.createdAt ? new Date(p.createdAt).toLocaleString() : '-'}</td>
                     <td className="p-2 border border-gray-200 dark:border-gray-700">

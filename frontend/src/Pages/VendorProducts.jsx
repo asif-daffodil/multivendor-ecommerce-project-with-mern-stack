@@ -165,7 +165,7 @@ export default function VendorProducts() {
                 {pageItems.map(p => (
                   <tr key={p._id} className="odd:bg-white even:bg-gray-50 odd:dark:bg-gray-900 even:dark:bg-gray-800">
                     <td className="p-2 border border-gray-200 dark:border-gray-700">{p.name}</td>
-                    <td className="p-2 border border-gray-200 dark:border-gray-700">{p.salePrice ?? p.regularPrice}</td>
+                    <td className="p-2 border border-gray-200 dark:border-gray-700">{'BDT '}{Number(p.salePrice ?? p.regularPrice ?? 0).toFixed(2)}</td>
                     <td className="p-2 border border-gray-200 dark:border-gray-700">{p.outOfStock ? 'Out of stock' : p.inventoryCount}</td>
                     <td className="p-2 border border-gray-200 dark:border-gray-700">
                       <div className="flex gap-2">

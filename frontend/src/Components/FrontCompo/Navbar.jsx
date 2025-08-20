@@ -97,7 +97,7 @@ const Navbar = () => {
                                                                 {i.variant && (
                                                                     <div className="text-xs text-gray-600 dark:text-gray-400 truncate">{i.variant.color ? `Color: ${i.variant.color}` : ''}{i.variant.color && i.variant.size ? ' • ' : ''}{i.variant.size ? `Size: ${i.variant.size}` : ''}</div>
                                                                 )}
-                                                                <div className="text-xs text-gray-600 dark:text-gray-400">Qty: {i.qty || 1} • ${(Number(i.price) * (i.qty || 1)).toFixed(2)}</div>
+                                                                <div className="text-xs text-gray-600 dark:text-gray-400">Qty: {i.qty || 1} • {'BDT '}{(Number(i.price) * (i.qty || 1)).toFixed(2)}</div>
                                                             </div>
                                                             <button onClick={()=>removeItem(i.id)} className="text-xs text-red-600 hover:underline">Remove</button>
                                                         </div>
@@ -107,7 +107,7 @@ const Navbar = () => {
                                                     )}
                                                     <div className="flex items-center justify-between pt-2 border-t border-gray-200 dark:border-gray-800">
                                                         <div className="text-sm font-semibold">Total</div>
-                                                        <div className="text-sm font-bold">${getTotalPrice().toFixed(2)}</div>
+                                                        <div className="text-sm font-bold">{'BDT '}{getTotalPrice().toFixed(2)}</div>
                                                     </div>
                                                     <div className="flex gap-2">
                                                         <Link to="/cart" className="flex-1 px-3 py-1.5 text-sm rounded border border-gray-300 dark:border-gray-700 text-center hover:bg-gray-100 dark:hover:bg-gray-800">View cart</Link>

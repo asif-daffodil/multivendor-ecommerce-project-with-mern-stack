@@ -23,7 +23,7 @@ const Cart = () => {
       <div key={i.id} className="flex items-center justify-between p-4 rounded border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900">
               <div>
                 <div className="font-medium">{i.name}</div>
-        <div className="text-sm text-gray-600 dark:text-gray-400">{'$'}{i.price}</div>
+                <div className="text-sm text-gray-600 dark:text-gray-400">{'BDT '}{Number(i.price).toFixed(2)}</div>
               </div>
               <div className="flex items-center gap-2">
                 <input type="number" min={1} value={i.qty} onChange={(e)=>setQty(i.id, Number(e.target.value))} className="w-20 p-2 border rounded bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-700" />
@@ -33,7 +33,7 @@ const Cart = () => {
           ))}
           <div className="flex items-center justify-between pt-4 border-t border-gray-200 dark:border-gray-800">
             <div className="text-lg font-semibold">Total</div>
-      <div className="text-xl font-bold">{'$'}{getTotalPrice().toFixed(2)}</div>
+            <div className="text-xl font-bold">{'BDT '}{getTotalPrice().toFixed(2)}</div>
           </div>
           <div className="flex justify-end">
             <button className="px-5 py-2 bg-green-600 text-white rounded" onClick={()=>navigate('/checkout')}>Checkout</button>

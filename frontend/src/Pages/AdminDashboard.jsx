@@ -9,6 +9,7 @@ const adminLinks = [
     { to: '/admin/products', label: 'Manage Products', icon: <span className="text-xl">🛒</span> },
     { to: '/admin/users', label: 'Manage Users', icon: <span className="text-xl">👥</span> },
     { to: '/admin/stats', label: 'System Stats', icon: <span className="text-xl">📊</span> },
+    { to: '/admin/orders', label: 'Orders', icon: <span className="text-xl">📦</span> },
 ];
 
 const AdminDashboard = () => {

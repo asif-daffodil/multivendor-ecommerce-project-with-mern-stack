@@ -106,11 +106,11 @@ export default function ProductDetail() {
             <div className="mt-3 flex items-baseline gap-3">
               {hasSale && regular ? (
                 <>
-                  <span className="text-gray-500 dark:text-gray-400 line-through">{regular}</span>
-                  <span className="text-2xl text-blue-600 dark:text-blue-400 font-extrabold">{price}</span>
+                  <span className="text-gray-500 dark:text-gray-400 line-through">{'BDT '}{Number(regular).toFixed(2)}</span>
+                  <span className="text-2xl text-blue-600 dark:text-blue-400 font-extrabold">{'BDT '}{Number(price).toFixed(2)}</span>
                 </>
               ) : (
-                <span className="text-2xl text-blue-600 dark:text-blue-400 font-extrabold">{price}</span>
+                <span className="text-2xl text-blue-600 dark:text-blue-400 font-extrabold">{'BDT '}{Number(price).toFixed(2)}</span>
               )}
             </div>
 

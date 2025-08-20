@@ -19,6 +19,8 @@ import AdminBrands from "./Pages/AdminBrands";
 import AdminProductForm from "./Pages/AdminProductForm";
 import VendorProducts from "./Pages/VendorProducts";
 import VendorProductForm from "./Pages/VendorProductForm";
+import AdminOrders from "./Pages/AdminOrders";
+import VendorOrders from "./Pages/VendorOrders";
 import Cart from "./Pages/Cart";
 import ProductDetail from "./Pages/ProductDetail";
 import Products from "./Pages/Products";
@@ -93,6 +95,11 @@ const router = createBrowserRouter([
         }
         ,
         {
+          path: "/dashboard/vendor/orders",
+          element: <VendorOrders />
+        }
+        ,
+        {
           path: "/dashboard/vendor/products/add",
           element: <VendorProductForm />
         }
@@ -109,6 +116,10 @@ const router = createBrowserRouter([
         {
           path: "/admin/products",
           element: <AdminProducts />
+        },
+        {
+          path: "/admin/orders",
+          element: <AdminOrders />
         },
         {
           path: "/admin/products/add",

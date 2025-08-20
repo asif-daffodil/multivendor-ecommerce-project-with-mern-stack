@@ -150,11 +150,11 @@ const Home = () => {
                                             <div className="mt-1 flex items-baseline gap-2">
                                                 {hasSale && regular ? (
                                                     <>
-                                                        <span className="text-sm text-gray-500 dark:text-gray-400 line-through">{regular}</span>
-                                                        <span className="text-blue-600 dark:text-blue-400 font-semibold">{price}</span>
+                                                        <span className="text-sm text-gray-500 dark:text-gray-400 line-through">{'BDT '}{Number(regular).toFixed(2)}</span>
+                                                        <span className="text-blue-600 dark:text-blue-400 font-semibold">{'BDT '}{Number(price).toFixed(2)}</span>
                                                     </>
                                                 ) : (
-                                                    <span className="text-blue-600 dark:text-blue-400 font-semibold">{price}</span>
+                                                    <span className="text-blue-600 dark:text-blue-400 font-semibold">{'BDT '}{Number(price).toFixed(2)}</span>
                                                 )}
                                             </div>
                                             <div className="mt-3 flex gap-2">

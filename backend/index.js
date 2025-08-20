@@ -42,6 +42,9 @@ app.use('/brand', brandRouter);
 const reviewRouter = require('./router/reviewRouter');
 app.use('/reviews', reviewRouter);
 
+const orderRouter = require('./router/orderRouter');
+app.use('/orders', orderRouter);
+
 app.listen(4000, () => {
     console.log('Server is running on port 4000');
 })
