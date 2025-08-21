@@ -18,6 +18,7 @@ import AdminCategories from "./Pages/AdminCategories";
 import AdminBrands from "./Pages/AdminBrands";
 import AdminUsers from "./Pages/AdminUsers";
 import AdminProductForm from "./Pages/AdminProductForm";
+import AdminStats from "./Pages/AdminStats";
 import VendorProducts from "./Pages/VendorProducts";
 import VendorProductForm from "./Pages/VendorProductForm";
 import AdminOrders from "./Pages/AdminOrders";
@@ -26,6 +27,8 @@ import Cart from "./Pages/Cart";
 import ProductDetail from "./Pages/ProductDetail";
 import Products from "./Pages/Products";
 import Checkout from "./Pages/Checkout";
+import PaymentsSuccess from "./Pages/PaymentsSuccess";
+import PaymentsFail from "./Pages/PaymentsSuccess"; // reuse simple component for fail/cancel for now
 
 const router = createBrowserRouter([
   {
@@ -51,6 +54,18 @@ const router = createBrowserRouter([
         {
           path: "/checkout",
           element: <Checkout />
+        },
+        {
+          path: "/payments/ssl/success",
+          element: <PaymentsSuccess />
+        },
+        {
+          path: "/payments/ssl/fail",
+          element: <PaymentsFail />
+        },
+        {
+          path: "/payments/ssl/cancel",
+          element: <PaymentsFail />
         },
         {
           path: "/sign-up",
@@ -121,6 +136,10 @@ const router = createBrowserRouter([
         {
           path: "/admin/orders",
           element: <AdminOrders />
+        },
+        {
+          path: "/admin/stats",
+          element: <AdminStats />
         },
         {
           path: "/admin/users",

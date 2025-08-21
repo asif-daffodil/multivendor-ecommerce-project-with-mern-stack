@@ -34,6 +34,15 @@ const orderSchema = new mongoose.Schema({
     postalCode: { type: String },
     phone: { type: String },
   },
+  // Payment details captured from gateway callbacks
+  payment: {
+    method: { type: String }, // e.g. 'cod' or 'sslcommerz'
+    provider: { type: String },
+    gatewayTransactionId: { type: String },
+    status: { type: String },
+    amount: { type: Number },
+    raw: { type: mongoose.Schema.Types.Mixed }
+  },
   status: { type: String, enum: ['pending', 'accepted', 'shipped', 'delivered', 'cancelled'], default: 'pending' },
   createdAt: { type: Date, default: Date.now },
   updatedAt: { type: Date, default: Date.now },

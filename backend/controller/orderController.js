@@ -54,8 +54,19 @@ const createOrder = async (req, res) => {
 
 const getOrdersForUser = async (req, res) => {
   try {
-    const orders = await Order.find({ user: req.user._id }).populate('items.product').sort({ createdAt: -1 });
-    res.json({ orders });
+    // support pagination for users: ?page=1&limit=20
+    const page = Math.max(1, parseInt(req.query.page || '1', 10));
+    const limit = Math.max(1, Math.min(100, parseInt(req.query.limit || '20', 10)));
+    const skip = (page - 1) * limit;
+
+    const filter = { user: req.user._id };
+    const [total, orders] = await Promise.all([
+      Order.countDocuments(filter),
+      Order.find(filter).populate('items.product').sort({ createdAt: -1 }).skip(skip).limit(limit)
+    ]);
+
+    const totalPages = Math.ceil(total / limit) || 1;
+    res.json({ orders, total, page, limit, totalPages });
   } catch (error) {
     res.status(500).json({ message: 'Error fetching orders', error });
   }
@@ -63,8 +74,18 @@ const getOrdersForUser = async (req, res) => {
 
 const getAllOrders = async (req, res) => {
   try {
-    const orders = await Order.find().populate('user').populate('items.product').sort({ createdAt: -1 });
-    res.json({ orders });
+    // support pagination via query params: ?page=1&limit=20
+    const page = Math.max(1, parseInt(req.query.page || '1', 10));
+    const limit = Math.max(1, Math.min(100, parseInt(req.query.limit || '20', 10)));
+    const skip = (page - 1) * limit;
+
+    const [total, orders] = await Promise.all([
+      Order.countDocuments(),
+      Order.find().populate('user').populate('items.product').sort({ createdAt: -1 }).skip(skip).limit(limit)
+    ]);
+
+    const totalPages = Math.ceil(total / limit);
+    res.json({ orders, total, page, limit, totalPages });
   } catch (error) {
     res.status(500).json({ message: 'Error fetching all orders', error });
   }

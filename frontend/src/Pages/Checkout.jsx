@@ -17,8 +17,9 @@ const Checkout = () => {
     fullName: '',
     addressLine: '',
     city: '',
-    postalCode: '',
-    phone: ''
+  postalCode: '',
+  phone: '',
+  email: ''
   });
   const [shippingSame, setShippingSame] = useState(true);
   const [shippingAddress, setShippingAddress] = useState({
@@ -36,8 +37,8 @@ const Checkout = () => {
     }
 
     // validation: billing required
-    if (!billingAddress.fullName || !billingAddress.addressLine || !billingAddress.city || !billingAddress.phone) {
-      Swal.fire('Billing address incomplete', 'Please provide full billing name, street address, city and phone.', 'warning');
+    if (!billingAddress.fullName || !billingAddress.addressLine || !billingAddress.city || !billingAddress.phone || !billingAddress.email) {
+      Swal.fire('Billing address incomplete', 'Please provide full billing name, street address, city, phone and email.', 'warning');
       return;
     }
 
@@ -58,6 +59,51 @@ const Checkout = () => {
     };
 
     try {
+      // If using a gateway, create the order then initiate the payment
+      if (paymentMethod === 'sslcommerz') {
+        const createRes = await api.post('/orders', payload);
+        if (!(createRes?.status >= 200 && createRes?.status < 300 && createRes?.data?.order)) {
+          Swal.fire('Error', createRes?.data?.message || 'Unable to create order before payment', 'error');
+          return;
+        }
+        const order = createRes.data.order;
+
+        // initiate SSLCommerz payment
+        const backendBase = (api.defaults && api.defaults.baseURL) ? api.defaults.baseURL : 'http://localhost:4000';
+        const initPayload = {
+          amount: order.total || payload.total,
+          order_id: order._id,
+          currency: 'BDT',
+          billing_name: billingAddress.fullName,
+          billing_address: `${billingAddress.addressLine} ${billingAddress.city} ${billingAddress.postalCode}`,
+          cus_email: billingAddress.email,
+          cus_phone: billingAddress.phone,
+          // Important: set callback URLs to backend so gateway posts reach server which can redirect to frontend
+          success_url: `${backendBase.replace(/\/$/, '')}/payments/ssl/success`,
+          fail_url: `${backendBase.replace(/\/$/, '')}/payments/ssl/fail`,
+          cancel_url: `${backendBase.replace(/\/$/, '')}/payments/ssl/cancel`,
+        };
+
+        const initRes = await api.post('/payments/ssl/init', initPayload);
+
+        // Defensive: backend may return a plain string during tests (e.g. "Init Payment").
+        if (typeof initRes.data === 'string') {
+          Swal.fire('Payment init error', `Unexpected server response: ${initRes.data}`, 'error');
+          return;
+        }
+
+        // Support a few possible shapes where GatewayPageURL may appear
+        const gatewayUrl = initRes?.data?.data?.GatewayPageURL || initRes?.data?.data?.gateway_page_url || initRes?.data?.GatewayPageURL || initRes?.data?.gateway_page_url;
+        if (gatewayUrl) {
+          // redirect user to SSLCommerz payment page
+          window.location.href = gatewayUrl;
+          return;
+        }
+        Swal.fire('Error', initRes?.data?.message || 'Failed to initiate payment', 'error');
+        return;
+      }
+
+      // Cash on delivery (default) flow: create order and finish locally
       const res = await api.post('/orders', payload);
       // Some backends return { message, order } without a `success` flag.
       if ((res?.status >= 200 && res?.status < 300) && res?.data && (res.data.order || res.data.message)) {
@@ -80,7 +126,8 @@ const Checkout = () => {
         addressLine: user.billingAddress.addressLine || '',
         city: user.billingAddress.city || '',
         postalCode: user.billingAddress.postalCode || '',
-        phone: user.billingAddress.phone || '',
+  phone: user.billingAddress.phone || '',
+  email: user.billingAddress.email || user.email || '',
       });
     }
   }, [user]);
@@ -109,6 +156,11 @@ const Checkout = () => {
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <input value={billingAddress.fullName} onChange={(e)=>setBillingAddress(s=>({...s, fullName: e.target.value}))} placeholder="Full name" className="p-2 border rounded" />
               <input value={billingAddress.phone} onChange={(e)=>setBillingAddress(s=>({...s, phone: e.target.value}))} placeholder="Phone" className="p-2 border rounded" />
+            </div>
+
+            <div className="mt-3 grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <input value={billingAddress.email} onChange={(e)=>setBillingAddress(s=>({...s, email: e.target.value}))} placeholder="Email" className="p-2 border rounded" />
+              <div />
             </div>
 
             <div className="mt-4">
@@ -147,7 +199,7 @@ const Checkout = () => {
             )}
 
             <div className="mt-6 text-sm text-gray-600 dark:text-gray-400">
-              <p>Note: For now we accept Cash on Delivery. You can add other payment methods later.</p>
+              <p>Note: For now we accept Cash on Delivery and SSLCommerz (gateway) payments. Choose a payment method on the right.</p>
             </div>
           </div>
 
@@ -199,6 +251,13 @@ const Checkout = () => {
                 <div>
                   <div className="font-medium">Cash on delivery</div>
                   <div className="text-sm text-gray-600">Pay with cash upon delivery.</div>
+                </div>
+              </label>
+              <label className="flex items-start gap-3 p-3 border rounded">
+                <input className="mt-1" type="radio" name="payment" checked={paymentMethod==='sslcommerz'} onChange={()=>setPaymentMethod('sslcommerz')} />
+                <div>
+                  <div className="font-medium">SSLCommerz (Online Payment)</div>
+                  <div className="text-sm text-gray-600">Pay online using SSLCommerz gateway.</div>
                 </div>
               </label>
             </div>

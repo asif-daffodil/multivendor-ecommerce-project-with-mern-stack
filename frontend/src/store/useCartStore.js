@@ -1,4 +1,5 @@
 import { create } from 'zustand';
+import Swal from 'sweetalert2';
 
 const loadCart = () => {
   try {
@@ -25,6 +26,18 @@ const useCartStore = create((set, get) => ({
     }
     saveCart(items);
     set({ items });
+    try {
+      Swal.fire({
+        toast: true,
+        position: 'top-end',
+        showConfirmButton: false,
+        timer: 2000,
+        icon: 'success',
+        title: `${item.name} added to cart`
+      });
+    } catch {
+      // ignore if Swal not available
+    }
   },
   setQty: (id, qty) => {
     let items = [...get().items];

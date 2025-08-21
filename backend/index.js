@@ -2,7 +2,10 @@ const express = require('express');
 const app = express();
 const cors = require('cors');
 const mongoose = require('mongoose');
-require('dotenv').config();
+// Load .env explicitly from this backend folder to avoid cwd issues
+require('dotenv').config({ path: __dirname + '/.env' });
+console.log('[startup] backend PID', process.pid);
+console.log('[startup] SSL env present', { SSLCZ_STORE_ID: !!process.env.SSLCZ_STORE_ID, SSLCZ_PASSWORD: !!process.env.SSLCZ_PASSWORD, SSLCZ_SANDBOX: process.env.SSLCZ_SANDBOX });
 app.use(cors({
     origin: '*',
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
@@ -12,6 +15,12 @@ app.use(cors({
 app.use(express.json());
 app.use(express.urlencoded());
 app.use(express.static('public'));
+
+// Debug: log incoming payments-related requests
+app.use('/payments', (req, res, next) => {
+    console.log('[incoming] payments request', { pid: process.pid, method: req.method, path: req.path, headers: { authorization: !!req.headers.authorization } });
+    next();
+});
 
 const conn = mongoose.connect(process.env.MONGODB_URI);
 if(conn) {
@@ -44,6 +53,12 @@ app.use('/reviews', reviewRouter);
 
 const orderRouter = require('./router/orderRouter');
 app.use('/orders', orderRouter);
+
+const paymentRouter = require('./router/paymentRouter');
+app.use('/payments', paymentRouter);
+
+const adminRouter = require('./router/adminRouter');
+app.use('/admin', adminRouter);
 
 app.listen(4000, () => {
     console.log('Server is running on port 4000');

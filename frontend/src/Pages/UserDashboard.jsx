@@ -1,41 +1,88 @@
-import React from 'react'
-import { Link } from 'react-router'
+import React, { useEffect, useState, useCallback } from 'react';
+import api from '../utils/apiClient';
+import DashboardSidebar from '../Components/DashboardSidebar';
+
+const userLinks = [
+    { to: '/dashboard/user', label: 'My Orders', icon: <span className="text-xl">📦</span> },
+    { to: '/profile', label: 'Profile', icon: <span className="text-xl">👤</span> },
+];
 
 const UserDashboard = () => {
-return (
-    <div className="max-w-6xl mx-auto p-8 bg-gradient-to-br from-blue-100 via-white to-blue-200 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 my-10">
-        <div className="bg-white dark:bg-gray-900 p-10 rounded-2xl shadow-2xl dark:border dark:border-gray-700 relative overflow-hidden">
-            <div className="absolute top-0 right-0 w-32 h-32 bg-blue-200 dark:bg-blue-900 rounded-full opacity-30 blur-2xl -z-10"></div>
-            <h1 className="text-3xl font-extrabold mb-4 text-blue-900 dark:text-blue-200 tracking-tight">Welcome to Your Dashboard</h1>
-            <p className="text-base text-gray-700 dark:text-gray-300 mb-8">Manage your account, track your progress, and explore new features. Your personalized widgets are below.</p>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div className="p-6 bg-gradient-to-tr from-blue-50 to-blue-200 dark:from-gray-800 dark:to-blue-900 rounded-xl shadow-md flex flex-col items-center hover:scale-105 transition-transform duration-200">
-                    <span className="text-4xl mb-2">📊</span>
-                    <h2 className="font-semibold text-lg mb-1 text-blue-800 dark:text-blue-200">Statistics</h2>
-                    <p className="text-xs text-gray-600 dark:text-gray-400 text-center">View your recent activity and performance.</p>
-                </div>
-                <div className="p-6 bg-gradient-to-tr from-blue-50 to-blue-200 dark:from-gray-800 dark:to-blue-900 rounded-xl shadow-md flex flex-col items-center hover:scale-105 transition-transform duration-200">
-                    <span className="text-4xl mb-2">📝</span>
-                    <h2 className="font-semibold text-lg mb-1 text-blue-800 dark:text-blue-200">Tasks</h2>
-                    <p className="text-xs text-gray-600 dark:text-gray-400 text-center">Check your pending tasks and reminders.</p>
-                </div>
-                <div className="p-6 bg-gradient-to-tr from-blue-50 to-blue-200 dark:from-gray-800 dark:to-blue-900 rounded-xl shadow-md flex flex-col items-center hover:scale-105 transition-transform duration-200">
-                    <span className="text-4xl mb-2">⚙️</span>
-                    <h2 className="font-semibold text-lg mb-1 text-blue-800 dark:text-blue-200">Settings</h2>
-                    <p className="text-xs text-gray-600 dark:text-gray-400 text-center">Update your preferences and account info.</p>
-                </div>
-            </div>
-            <div className="mt-8 flex justify-end">
-                <Link
-                    to="/profile"
-                    className="inline-block px-6 py-2 rounded-full bg-blue-600 text-white dark:bg-blue-500 dark:text-gray-100 font-semibold shadow hover:bg-blue-700 dark:hover:bg-blue-600 transition-colors duration-200"
-                >
-                    Back to Profile
-                </Link>
-            </div>
-        </div>
-    </div>
-)
-}
+    const [orders, setOrders] = useState([]);
+    const [page, setPage] = useState(1);
+    const [limit, setLimit] = useState(10);
+    const [totalPages, setTotalPages] = useState(1);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState('');
 
-export default UserDashboard
+    const load = useCallback(async () => {
+        setLoading(true); setError('');
+        try {
+            const res = await api.get(`/orders?page=${page}&limit=${limit}`);
+            setOrders(res.data.orders || []);
+            setTotalPages(res.data.totalPages || 1);
+        } catch (e) { setError(e?.response?.data?.message || 'Failed to load orders'); }
+        finally { setLoading(false); }
+    }, [page, limit]);
+
+    useEffect(()=>{ load(); }, [load]);
+
+    return (
+        <div className="flex min-h-screen bg-blue-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100">
+            <DashboardSidebar links={userLinks} color="blue" />
+            <main className="flex-1 p-6">
+                <h2 className="text-2xl font-bold mb-4">My Orders</h2>
+                {error && <div className="mb-4 text-red-600">{error}</div>}
+
+                <div className="overflow-x-auto bg-white dark:bg-gray-900 p-4 rounded shadow">
+                    {loading ? <div>Loading...</div> : (
+                        <table className="min-w-full border border-gray-200 dark:border-gray-700">
+                            <thead>
+                                <tr className="bg-gray-100 dark:bg-gray-800">
+                                    <th className="p-2 border text-left">Order</th>
+                                    <th className="p-2 border text-left">Status</th>
+                                    <th className="p-2 border text-left">Total</th>
+                                    <th className="p-2 border text-left">Created</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {orders.map(o => (
+                                    <tr key={o._id} className="odd:bg-white even:bg-gray-50 odd:dark:bg-gray-900 even:dark:bg-gray-800">
+                                        <td className="p-2 border text-sm">{o._id}</td>
+                                        <td className="p-2 border font-medium">{o.status}</td>
+                                        <td className="p-2 border">{'BDT '}{Number(o.total || 0).toFixed(2)}</td>
+                                        <td className="p-2 border text-xs text-gray-600 dark:text-gray-400">{o.createdAt ? new Date(o.createdAt).toLocaleString() : '-'}</td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    )}
+                </div>
+
+                {/* Pagination */}
+                <div className="mt-4 flex items-center justify-between">
+                    <div>
+                        <label className="text-sm mr-2">Per page:</label>
+                        <select value={limit} onChange={(e)=>setLimit(Number(e.target.value))} className="border p-1 text-sm">
+                            <option value={5}>5</option>
+                            <option value={10}>10</option>
+                            <option value={20}>20</option>
+                        </select>
+                    </div>
+                    <div className="flex items-center gap-2">
+                        <button disabled={page<=1} onClick={()=>setPage(p=>Math.max(1,p-1))} className="px-3 py-1 border rounded disabled:opacity-50">Prev</button>
+                        {Array.from({length: totalPages}).slice(0, 10).map((_, idx) => {
+                            const p = idx + 1;
+                            return (
+                                <button key={p} onClick={()=>setPage(p)} className={`px-2 py-1 border rounded ${p===page ? 'bg-gray-200' : ''}`}>{p}</button>
+                            );
+                        })}
+                        <button disabled={page>=totalPages} onClick={()=>setPage(p=>Math.min(totalPages,p+1))} className="px-3 py-1 border rounded disabled:opacity-50">Next</button>
+                    </div>
+                </div>
+            </main>
+        </div>
+    );
+};
+
+export default UserDashboard;
