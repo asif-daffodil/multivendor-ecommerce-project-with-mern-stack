@@ -1,4 +1,6 @@
 const Category = require('../model/category');
+const SubCategory = require('../model/subcategory');
+const Product = require('../model/product');
 
 // Add new category (admin only)
 exports.addCategory = async (req, res) => {
@@ -57,9 +59,16 @@ exports.updateCategory = async (req, res) => {
 exports.deleteCategory = async (req, res) => {
     try {
         const { id } = req.params;
-        const deleted = await Category.findByIdAndDelete(id);
-        if (!deleted) return res.status(404).json({ message: 'Category not found' });
-        res.json({ message: 'Category deleted' });
+    const deleted = await Category.findByIdAndDelete(id);
+    if (!deleted) return res.status(404).json({ message: 'Category not found' });
+
+    // remove subcategories under this category
+    await SubCategory.deleteMany({ parent: deleted._id });
+
+    // clear category and subcategory references from products
+    await Product.updateMany({ category: deleted._id }, { $unset: { category: '', subcategory: '' } });
+
+    res.json({ message: 'Category deleted and related subcategories/products updated' });
     } catch (error) {
         res.status(500).json({ message: 'Server error', error });
     }
