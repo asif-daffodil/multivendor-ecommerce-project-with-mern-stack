@@ -106,12 +106,39 @@ exports.createProduct = async (req, res) => {
   }
 };
 
-exports.getProducts = async (_req, res) => {
+exports.getProducts = async (req, res) => {
   try {
-    const products = await Product.find()
+    // support optional search and pagination for server-side search
+    const { search, page, limit } = req.query;
+    const pageNum = Math.max(1, parseInt(page || '1', 10));
+    const lim = Math.max(1, Math.min(100, parseInt(limit || '1000', 10)));
+
+    const filter = {};
+    if (search && String(search).trim() !== '') {
+      const q = String(search).trim();
+      // case-insensitive partial match on name or shortDescription
+      filter.$or = [
+        { name: { $regex: q, $options: 'i' } },
+        { shortDescription: { $regex: q, $options: 'i' } }
+      ];
+    }
+
+    // If pagination requested (page param present) return paginated object
+    if (req.query.page) {
+      const skip = (pageNum - 1) * lim;
+      const [total, products] = await Promise.all([
+        Product.countDocuments(filter),
+        Product.find(filter).populate('category', 'name').populate('brand', 'name').populate('owner', 'name role').skip(skip).limit(lim).sort({ createdAt: -1 })
+      ]);
+      const totalPages = Math.max(1, Math.ceil(total / lim));
+      return res.json({ products, total, page: pageNum, limit: lim, totalPages });
+    }
+
+    const products = await Product.find(filter)
       .populate('category', 'name')
       .populate('brand', 'name')
-      .populate('owner', 'name role');
+      .populate('owner', 'name role')
+      .sort({ createdAt: -1 });
     res.json(products);
   } catch (error) {
     res.status(500).json({ message: 'Server error', error });

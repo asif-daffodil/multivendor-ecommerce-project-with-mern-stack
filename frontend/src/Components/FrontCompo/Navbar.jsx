@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import useAuthStore from "../../store/useAuthStore";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faHome, faBoxOpen, faUser, faUserCircle, faSun, faMoon, faCartShopping } from '@fortawesome/free-solid-svg-icons';
+import { faHome, faBoxOpen, faUser, faUserCircle, faSun, faMoon, faCartShopping, faSearch } from '@fortawesome/free-solid-svg-icons';
 import { faFacebook, faTwitter, faInstagram, faWhatsapp } from '@fortawesome/free-brands-svg-icons';
 import { Link, useNavigate } from 'react-router';
 import { toggleTheme } from '../../utils/theme'
@@ -50,6 +50,18 @@ const Navbar = () => {
     }
     const avatarSrc = resolveImage(user?.profilePicture)
 
+    const [navSearch, setNavSearch] = useState('');
+    const submitSearch = (e) => {
+        if (e && e.preventDefault) e.preventDefault();
+        const q = (navSearch || '').trim();
+        if (q === '') {
+            navigate('/products');
+        } else {
+            // encode query
+            navigate(`/products?search=${encodeURIComponent(q)}`);
+        }
+    };
+
     return (
         <nav className="bg-white border-b relative z-50 dark:bg-black dark:border-gray-700">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -69,6 +81,14 @@ const Navbar = () => {
                     </div>
                     <div className="flex items-center">
                         <div className="hidden md:flex items-center">
+                            <form onSubmit={submitSearch} className="mr-3">
+                                <div className="flex items-center border rounded overflow-hidden bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-700">
+                                    <input value={navSearch} onChange={(e)=>setNavSearch(e.target.value)} placeholder="Search products" className="p-2 w-64 bg-transparent outline-none placeholder-gray-400 dark:placeholder-gray-500" />
+                                    <button type="submit" aria-label="Search" className="px-3 py-2 bg-blue-600 text-white hover:bg-blue-700">
+                                        <FontAwesomeIcon icon={faSearch} />
+                                    </button>
+                                </div>
+                            </form>
                             <button onClick={() => { toggleTheme(); setIsDark(document.documentElement.classList.contains('dark')); }} aria-label="Toggle theme" className="mr-3 p-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700">
                                 <FontAwesomeIcon icon={isDark ? faSun : faMoon} className="text-gray-700 dark:text-gray-200" />
                             </button>

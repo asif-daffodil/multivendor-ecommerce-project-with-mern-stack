@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { Link } from 'react-router';
+import { Link, useLocation } from 'react-router';
 import api from '../utils/apiClient';
 import useCartStore from '../store/useCartStore';
 
@@ -59,6 +59,15 @@ export default function Products() {
   };
 
   useEffect(() => { load(); }, []);
+
+  // sync search state with query param (so navbar search navigates here)
+  const location = useLocation();
+  useEffect(() => {
+    const params = new URLSearchParams(location.search || '');
+    const q = params.get('search') || '';
+    setSearch(q);
+    setPage(1);
+  }, [location.search]);
 
   // Load subcategories when category changes
   useEffect(() => {
