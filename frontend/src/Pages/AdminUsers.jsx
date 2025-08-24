@@ -66,6 +66,7 @@ export default function AdminUsers() {
                   <th className="p-2 border">Email</th>
                   <th className="p-2 border">Role</th>
                   <th className="p-2 border">Banned</th>
+                  <th className="p-2 border">Ban Reason</th>
                   <th className="p-2 border">Actions</th>
                 </tr>
               </thead>
@@ -77,10 +78,13 @@ export default function AdminUsers() {
                     <td className="p-2 border">{u.email}</td>
                     <td className="p-2 border">{u.role}</td>
                     <td className="p-2 border">{u.banned ? 'Yes' : 'No'}</td>
+                    <td className="p-2 border text-sm text-gray-700 dark:text-gray-300">{u.banReason || '-'}</td>
                     <td className="p-2 border">
                       <div className="flex gap-2">
                         {u.banned ? (
-                          <button className="px-2 py-1 bg-green-600 text-white rounded" onClick={()=>unban(u._id)}>Unban</button>
+                          <>
+                            <button className="px-2 py-1 bg-green-600 text-white rounded" onClick={()=>unban(u._id)}>Unban</button>
+                          </>
                         ) : (
                           <button className="px-2 py-1 bg-red-600 text-white rounded" onClick={()=>ban(u._id)}>Ban</button>
                         )}

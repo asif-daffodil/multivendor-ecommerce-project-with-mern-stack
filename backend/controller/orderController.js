@@ -62,7 +62,12 @@ const getOrdersForUser = async (req, res) => {
     const filter = { user: req.user._id };
     const [total, orders] = await Promise.all([
       Order.countDocuments(filter),
-      Order.find(filter).populate('items.product').sort({ createdAt: -1 }).skip(skip).limit(limit)
+      Order.find(filter)
+        .populate('items.product')
+        .populate('items.vendor', 'name email')
+        .sort({ createdAt: -1 })
+        .skip(skip)
+        .limit(limit)
     ]);
 
     const totalPages = Math.ceil(total / limit) || 1;
@@ -81,7 +86,14 @@ const getAllOrders = async (req, res) => {
 
     const [total, orders] = await Promise.all([
       Order.countDocuments(),
-      Order.find().populate('user').populate('items.product').sort({ createdAt: -1 }).skip(skip).limit(limit)
+      // populate user, product and vendor info on items so admin can view vendor details
+      Order.find()
+        .populate('user')
+        .populate('items.product')
+        .populate('items.vendor', 'name email')
+        .sort({ createdAt: -1 })
+        .skip(skip)
+        .limit(limit)
     ]);
 
     const totalPages = Math.ceil(total / limit);
@@ -94,7 +106,11 @@ const getAllOrders = async (req, res) => {
 const getOrdersForVendor = async (req, res) => {
   try {
     const vendorId = req.user._id;
-    const orders = await Order.find({ 'items.vendor': vendorId }).populate('user').populate('items.product').sort({ createdAt: -1 });
+    const orders = await Order.find({ 'items.vendor': vendorId })
+      .populate('user')
+      .populate('items.product')
+      .populate('items.vendor', 'name email')
+      .sort({ createdAt: -1 });
     res.json({ orders });
   } catch (error) {
     res.status(500).json({ message: 'Error fetching vendor orders', error });

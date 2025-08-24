@@ -59,6 +59,7 @@ export default function AdminOrders() {
                 <tr className="bg-gray-100 dark:bg-gray-800">
                   <th className="p-2 border">#</th>
                   <th className="p-2 border">Buyer</th>
+                  <th className="p-2 border">Vendor(s)</th>
                   <th className="p-2 border">Delivery Address</th>
                   <th className="p-2 border">Items</th>
                   <th className="p-2 border">Total</th>
@@ -73,6 +74,12 @@ export default function AdminOrders() {
                   <tr key={o._id} className="odd:bg-white even:bg-gray-50 odd:dark:bg-gray-900 even:dark:bg-gray-800">
                     <td className="p-2 border">{o._id}</td>
                     <td className="p-2 border">{o.user?.name || o.user?.email || '-'}</td>
+                    <td className="p-2 border">
+                      {(() => {
+                        const vendors = Array.from(new Set((o.items || []).map(i => (i.vendor && (i.vendor.name || i.vendor.email)) || 'Company')));
+                        return vendors.join(', ');
+                      })()}
+                    </td>
                     <td className="p-2 border align-top">
                       {o.deliveryAddress ? (
                         <div className="text-sm">

@@ -1,6 +1,7 @@
 
 import React from 'react';
 import { Link } from 'react-router';
+import useAuthStore from '../store/useAuthStore';
 import DashboardSidebar from '../Components/DashboardSidebar';
 
 const vendorLinks = [
@@ -19,6 +20,18 @@ const VendorDashboard = () => {
                     Vendor Dashboard
                 </h1>
                 <p className="text-base text-gray-700 dark:text-gray-200 mb-8">Welcome! Manage your orders, products, and view stats at a glance.</p>
+                {(() => {
+                    const user = useAuthStore.getState().user;
+                    if (user && user.banned) {
+                        return (
+                            <div className="mb-4 p-4 bg-red-100 border border-red-200 text-red-800 rounded">
+                                <div className="font-semibold">Your account is banned{user.banReason ? ` — ${user.banReason}` : ''}</div>
+                                <div className="text-xs text-gray-600 mt-2">If you think this is a mistake contact support.</div>
+                            </div>
+                        );
+                    }
+                    return null;
+                })()}
                 {/* Dashboard widgets or content can go here */}
                 <div className="mt-8 flex justify-end">
                     <Link to="/profile" className="inline-block px-6 py-2 bg-green-600 text-white rounded-lg shadow hover:bg-green-700 transition-colors font-semibold">
