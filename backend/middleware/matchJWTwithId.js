@@ -29,7 +29,7 @@ const matchJWTwithId = async (req, res, next) => {
             }
 
             // Generate new token
-            const newToken = jwt.sign({ id: decoded.id }, process.env.JWT_SECRET, { expiresIn: '1m' });
+            const newToken = jwt.sign({ id: decoded.id }, process.env.JWT_SECRET, { expiresIn: '30d' });
 
             // Attach user & continue
             req.user = await User.findById(decoded.id);

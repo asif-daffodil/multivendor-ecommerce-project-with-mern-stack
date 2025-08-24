@@ -18,7 +18,7 @@ const checkAuth = async (req, res, next) => {
         // refresh token
         // If token expired, generate a new token and set it in response header
         if (decoded.exp * 1000 < Date.now()) {
-            const newToken = jwt.sign({ id: decoded.id }, process.env.JWT_SECRET, { expiresIn: '1m' });
+            const newToken = jwt.sign({ id: decoded.id }, process.env.JWT_SECRET, { expiresIn: '30d' });
             res.setHeader('Authorization', `Bearer ${newToken}`);
         }
         req.user = await User.findById(decoded.id);
@@ -35,7 +35,7 @@ const checkAuth = async (req, res, next) => {
             }
 
             // Generate new token
-            const newToken = jwt.sign({ id: decoded.id }, process.env.JWT_SECRET, { expiresIn: '1m' });
+            const newToken = jwt.sign({ id: decoded.id }, process.env.JWT_SECRET, { expiresIn: '30d' });
 
             // Attach user & continue
             req.user = await User.findById(decoded.id);
@@ -77,7 +77,7 @@ const checkAdmin = async (req, res, next) => {
             }
 
             // Generate new token
-            const newToken = jwt.sign({ id: decoded.id }, process.env.JWT_SECRET, { expiresIn: '1m' });
+            const newToken = jwt.sign({ id: decoded.id }, process.env.JWT_SECRET, { expiresIn: '30d' });
             res.setHeader('Authorization', `Bearer ${newToken}`);
 
             // Attach user & continue
@@ -119,7 +119,7 @@ const checkVendor = async (req, res, next) => {
             }
 
             // Generate new token
-            const newToken = jwt.sign({ id: decoded.id }, process.env.JWT_SECRET, { expiresIn: '1m' });
+            const newToken = jwt.sign({ id: decoded.id }, process.env.JWT_SECRET, { expiresIn: '30d' });
 
             // Attach user & continue
             res.setHeader('Authorization', `Bearer ${newToken}`);
