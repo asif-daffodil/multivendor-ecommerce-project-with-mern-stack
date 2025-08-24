@@ -3,4 +3,6 @@
 
 # Ignore backend uploaded files (images, other user uploads)
 /backend/public/uploads/
-/backend/public/profile_pictures/
+# Ignore everything in profile_pictures except the repository default image
+/backend/public/profile_pictures/*
+!/backend/public/profile_pictures/default.jpg
