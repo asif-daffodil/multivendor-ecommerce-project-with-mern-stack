@@ -3,24 +3,17 @@ import api from '../utils/apiClient';
 import DashboardSidebar from '../Components/DashboardSidebar';
 import RichText from '../Components/RichText';
 import Modal from '../Components/Modal';
-
-const adminLinks = [
-  { to: '/admin/categories', label: 'Manage Categories', icon: <span className="text-xl">📦</span> },
-  { to: '/admin/brands', label: 'Manage Brands', icon: <span className="text-xl">🏷️</span> },
-  { to: '/admin/products', label: 'Manage Products', icon: <span className="text-xl">🛒</span> },
-  { to: '/admin/users', label: 'Manage Users', icon: <span className="text-xl">👥</span> },
-  { to: '/admin/stats', label: 'System Stats', icon: <span className="text-xl">📊</span> },
-];
+import adminLinks from './adminLinks.jsx';
 
 const AdminCategories = () => {
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-  const [form, setForm] = useState({ name: '', description: '' });
+  const [form, setForm] = useState({ name: '', description: '', serviceCharge: 10 });
   const [saving, setSaving] = useState(false);
   const [success, setSuccess] = useState('');
   const [editing, setEditing] = useState(null); // category being edited
-  const [editForm, setEditForm] = useState({ name: '', description: '' });
+  const [editForm, setEditForm] = useState({ name: '', description: '', serviceCharge: 10 });
   // subcategories state
   const [subForm, setSubForm] = useState({ name: '', description: '', parent: '' });
   // modal controls
@@ -47,11 +40,11 @@ const AdminCategories = () => {
       const res = await api.get('/category');
       const cats = res.data || [];
       // fetch subs for all categories in parallel
-      const withSubs = await Promise.all(
+  const withSubs = await Promise.all(
         cats.map(async (c) => {
           try {
             const sres = await api.get(`/subcategory?parent=${c._id}`);
-            return { ...c, subcategories: sres.data || [] };
+    return { ...c, subcategories: sres.data || [] };
           } catch {
             return { ...c, subcategories: [] };
           }
@@ -94,7 +87,7 @@ const AdminCategories = () => {
 
   const startEdit = (cat) => {
     setEditing(cat);
-    setEditForm({ name: cat.name || '', description: cat.description || '' });
+  setEditForm({ name: cat.name || '', description: cat.description || '', serviceCharge: typeof cat.serviceCharge !== 'undefined' ? cat.serviceCharge : 10 });
   setOpenEditCat(true);
   };
 
@@ -275,7 +268,8 @@ const AdminCategories = () => {
                   <th className="p-2 border border-gray-200 dark:border-gray-700 text-left cursor-pointer select-none" onClick={() => toggleSort('name')}>
                     Name {sortKey === 'name' && (sortDir === 'asc' ? '▲' : '▼')}
                   </th>
-                  <th className="p-2 border border-gray-200 dark:border-gray-700 text-left">Description</th>
+                            <th className="p-2 border border-gray-200 dark:border-gray-700 text-left">Description</th>
+                            <th className="p-2 border border-gray-200 dark:border-gray-700 text-left">Service Charge</th>
                   <th className="p-2 border border-gray-200 dark:border-gray-700 text-left cursor-pointer select-none" onClick={() => toggleSort('createdAt')}>
                     Created {sortKey === 'createdAt' && (sortDir === 'asc' ? '▲' : '▼')}
                   </th>
@@ -292,6 +286,7 @@ const AdminCategories = () => {
             <div className="prose prose-sm max-w-none dark:prose-invert" dangerouslySetInnerHTML={{ __html: c.description }} />
                       ) : '-' }
                     </td>
+                              <td className="p-2 border border-gray-200 dark:border-gray-700">{typeof c.serviceCharge !== 'undefined' ? `${c.serviceCharge}%` : '10%'}</td>
                     <td className="p-2 border border-gray-200 dark:border-gray-700">
                       <div className="text-sm mb-2">{c.createdAt ? new Date(c.createdAt).toLocaleString() : '-'}</div>
                       <div className="flex gap-2">
@@ -352,7 +347,14 @@ const AdminCategories = () => {
       {/* Add Category Modal */}
       <Modal open={openAddCat} onClose={() => setOpenAddCat(false)} title="Add Category" footer={null}>
         <form onSubmit={handleSubmit} className="grid grid-cols-1 gap-3">
-          <input name="name" value={form.name} onChange={handleChange} placeholder="Category name" className="p-2 border rounded bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-700" required />
+          <div>
+            <label className="block text-sm font-medium mb-1">Category name</label>
+            <input name="name" value={form.name} onChange={handleChange} placeholder="Category name" className="p-2 border rounded bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-700" required />
+          </div>
+          <div>
+            <label className="block text-sm font-medium mb-1">Service charge (%)</label>
+            <input name="serviceCharge" value={form.serviceCharge} onChange={(e)=>setForm(f=>({...f,serviceCharge:Number(e.target.value)}))} type="number" min="0" max="100" className="p-2 border rounded bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-700" placeholder="Service charge (%)" />
+          </div>
           <div>
             <label className="block text-sm font-medium mb-1">Description (optional)</label>
             <RichText value={form.description} onChange={(val) => setForm((f) => ({ ...f, description: val }))} />
@@ -367,7 +369,14 @@ const AdminCategories = () => {
       {/* Edit Category Modal */}
       <Modal open={openEditCat} onClose={cancelEdit} title="Edit Category" footer={null}>
         <form onSubmit={submitEdit} className="grid grid-cols-1 gap-3">
-          <input className="p-2 border rounded bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-700" value={editForm.name} onChange={(e) => setEditForm((f) => ({ ...f, name: e.target.value }))} placeholder="Name" required />
+          <div>
+            <label className="block text-sm font-medium mb-1">Category name</label>
+            <input className="p-2 border rounded bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-700" value={editForm.name} onChange={(e) => setEditForm((f) => ({ ...f, name: e.target.value }))} placeholder="Name" required />
+          </div>
+          <div>
+            <label className="block text-sm font-medium mb-1">Service charge (%)</label>
+            <input name="serviceCharge" value={editForm.serviceCharge} onChange={(e)=>setEditForm(f=>({...f,serviceCharge:Number(e.target.value)}))} type="number" min="0" max="100" className="p-2 border rounded bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-700" placeholder="Service charge (%)" />
+          </div>
           <div>
             <label className="block text-sm font-medium mb-1">Description</label>
             <RichText value={editForm.description} onChange={(val) => setEditForm((f) => ({ ...f, description: val }))} />

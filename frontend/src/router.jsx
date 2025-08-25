@@ -23,6 +23,9 @@ import VendorProducts from "./Pages/VendorProducts";
 import VendorProductForm from "./Pages/VendorProductForm";
 import AdminOrders from "./Pages/AdminOrders";
 import VendorOrders from "./Pages/VendorOrders";
+import VendorPayments from "./Pages/VendorPayments";
+import VendorServiceCharges from "./Pages/VendorServiceCharges";
+import AdminPayments from "./Pages/AdminPayments";
 import Cart from "./Pages/Cart";
 import ProductDetail from "./Pages/ProductDetail";
 import Products from "./Pages/Products";
@@ -116,6 +119,16 @@ const router = createBrowserRouter([
         }
         ,
         {
+          path: "/dashboard/vendor/payments",
+          element: <VendorPayments />
+        }
+        ,
+        {
+          path: "/dashboard/vendor/service-charges",
+          element: <VendorServiceCharges />
+        }
+        ,
+        {
           path: "/dashboard/vendor/products/add",
           element: <VendorProductForm />
         }
@@ -136,6 +149,10 @@ const router = createBrowserRouter([
         {
           path: "/admin/orders",
           element: <AdminOrders />
+        },
+        {
+          path: "/admin/payments",
+          element: <AdminPayments />
         },
         {
           path: "/admin/stats",

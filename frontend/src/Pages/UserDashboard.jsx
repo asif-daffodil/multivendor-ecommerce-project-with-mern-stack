@@ -47,13 +47,30 @@ const UserDashboard = () => {
                             </thead>
                             <tbody>
                                 {orders.map(o => (
-                                    <tr key={o._id} className="odd:bg-white even:bg-gray-50 odd:dark:bg-gray-900 even:dark:bg-gray-800">
-                                        <td className="p-2 border text-sm">{o._id}</td>
-                                        <td className="p-2 border font-medium">{o.status}</td>
-                                        <td className="p-2 border">{'BDT '}{Number(o.total || 0).toFixed(2)}</td>
-                                        <td className="p-2 border text-xs text-gray-600 dark:text-gray-400">{o.createdAt ? new Date(o.createdAt).toLocaleString() : '-'}</td>
-                                    </tr>
-                                ))}
+                                            <tr key={o._id} className="odd:bg-white even:bg-gray-50 odd:dark:bg-gray-900 even:dark:gray-800">
+                                                <td className="p-2 border text-sm">
+                                                    <div className="space-y-2">
+                                                        {o.items.map(it => (
+                                                            <div key={it._id} className="flex items-center gap-3">
+                                                                <img src={it.productImage ? `http://localhost:4000/${it.productImage}` : '/hero-ecommerce.svg'} alt={it.productName} className="w-12 h-12 object-cover rounded" />
+                                                                <div className="text-sm">
+                                                                    <div className="font-medium">{it.productName}</div>
+                                                                    <div className="text-xs text-gray-500">qty: {it.qty} • {'BDT '}{Number(it.price || 0).toFixed(2)}</div>
+                                                                </div>
+                                                                {o.status === 'delivered' && !it.hasReview && (
+                                                                    <div className="ml-auto">
+                                                                        <a className="text-sm text-blue-600 hover:underline" href={`/products/${it.product}`}>Write review</a>
+                                                                    </div>
+                                                                )}
+                                                            </div>
+                                                        ))}
+                                                    </div>
+                                                </td>
+                                                <td className="p-2 border font-medium">{o.status}</td>
+                                                <td className="p-2 border">{'BDT '}{Number(o.total || 0).toFixed(2)}</td>
+                                                <td className="p-2 border text-xs text-gray-600 dark:text-gray-400">{o.createdAt ? new Date(o.createdAt).toLocaleString() : '-'}</td>
+                                            </tr>
+                                        ))}
                             </tbody>
                         </table>
                     )}

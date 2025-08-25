@@ -1,15 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import api from '../utils/apiClient';
 import DashboardSidebar from '../Components/DashboardSidebar';
-
-const adminLinks = [
-  { to: '/admin/categories', label: 'Manage Categories', icon: <span className="text-xl">📦</span> },
-  { to: '/admin/brands', label: 'Manage Brands', icon: <span className="text-xl">🏷️</span> },
-  { to: '/admin/products', label: 'Manage Products', icon: <span className="text-xl">🛒</span> },
-  { to: '/admin/users', label: 'Manage Users', icon: <span className="text-xl">👥</span> },
-  { to: '/admin/stats', label: 'System Stats', icon: <span className="text-xl">📊</span> },
-  { to: '/admin/orders', label: 'Orders', icon: <span className="text-xl">📦</span> },
-];
+import adminLinks from './adminLinks.jsx';
 
 export default function AdminUsers() {
   const [users, setUsers] = useState([]);

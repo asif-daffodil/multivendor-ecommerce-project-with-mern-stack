@@ -8,6 +8,8 @@ const vendorLinks = [
     { to: '/dashboard/vendor/orders', label: 'Orders', icon: <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M3 7h18M3 12h18M3 17h18"></path></svg> },
     { to: '/dashboard/vendor/products', label: 'Products', icon: <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M20 21V7a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v14"></path><rect x="8" y="11" width="8" height="10" rx="2"></rect></svg> },
     { to: '/dashboard/vendor/stats', label: 'Stats', icon: <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M4 17h16M4 13h16M4 9h16"></path></svg> },
+    { to: '/dashboard/vendor/payments', label: 'Payments', icon: <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M12 8v4l3 3"></path><circle cx="12" cy="12" r="10"></circle></svg> },
+    { to: '/dashboard/vendor/service-charges', label: 'Service Charges', icon: <span className="text-xl">% </span> },
 ];
 
 const VendorDashboard = () => {

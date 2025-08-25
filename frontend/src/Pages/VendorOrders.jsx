@@ -6,6 +6,8 @@ const vendorLinks = [
   { to: '/dashboard/vendor/orders', label: 'Orders', icon: <span className="text-xl">📦</span> },
   { to: '/dashboard/vendor/products', label: 'Products', icon: <span className="text-xl">🛒</span> },
   { to: '/dashboard/vendor/stats', label: 'Stats', icon: <span className="text-xl">📊</span> },
+  { to: '/dashboard/vendor/payments', label: 'Payments', icon: <span className="text-xl">💰</span> },
+  { to: '/dashboard/vendor/service-charges', label: 'Service Charges', icon: <span className="text-xl">% </span> },
 ];
 
 export default function VendorOrders() {

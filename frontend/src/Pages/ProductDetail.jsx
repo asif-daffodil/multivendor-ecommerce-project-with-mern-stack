@@ -1,7 +1,8 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { Link, useParams, useNavigate } from 'react-router';
 import api from '../utils/apiClient';
 import useCartStore from '../store/useCartStore';
+import useAuthStore from '../store/useAuthStore';
 
 const API_BASE = 'http://localhost:4000';
 const resolveImage = (path) => {
@@ -17,6 +18,14 @@ export default function ProductDetail() {
   const addItem = useCartStore((s) => s.addItem);
 
   const [p, setP] = useState(null);
+  const [reviews, setReviews] = useState([]);
+  const [canReview, setCanReview] = useState(false);
+  const [alreadyReviewed, setAlreadyReviewed] = useState(false);
+  const [myRating, setMyRating] = useState(5);
+  const [myComment, setMyComment] = useState('');
+  const currentUser = useAuthStore((s) => s.user);
+  const [editing, setEditing] = useState(false);
+  const formRef = useRef(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [activeImg, setActiveImg] = useState(null);
@@ -39,12 +48,47 @@ export default function ProductDetail() {
   const sizes = Array.isArray(data.sizes) ? data.sizes : [];
   setSelectedColor(colors.length === 1 ? colors[0] : null);
   setSelectedSize(sizes.length === 1 ? sizes[0] : null);
-      } catch (e) {
-        setError(e?.response?.data?.message || 'Failed to load product');
+      } catch {
+        setError('Failed to load product');
       } finally {
         setLoading(false);
       }
     })();
+  }, [id, currentUser]);
+
+  useEffect(() => {
+    // fetch reviews and can-review status
+    let mounted = true;
+    (async () => {
+      try {
+        const r = await api.get(`/reviews/${id}`);
+        if (!mounted) return;
+        setReviews(r.data || []);
+      } catch {
+        // ignore
+      }
+
+      try {
+        const cr = await api.get(`/reviews/can-review/${id}`);
+        if (!mounted) return;
+        const can = !!cr.data?.canReview;
+        const already = !!cr.data?.alreadyReviewed;
+        setCanReview(can);
+        setAlreadyReviewed(already);
+
+        // If user already reviewed, prefill the form with their review
+        if (already && currentUser) {
+          const userReview = (await api.get(`/reviews/${id}`)).data.find(r => r.user?._id === currentUser._id || r.user?._id === currentUser.id);
+          if (userReview) {
+            setMyRating(userReview.rating || 5);
+            setMyComment(userReview.comment || '');
+          }
+        }
+      } catch {
+        // ignore (not logged in)
+      }
+    })();
+    return () => { mounted = false; };
   }, [id]);
 
   const hasSale = useMemo(() => p && p.salePrice !== undefined && p.salePrice !== null && p.salePrice !== '', [p]);
@@ -152,6 +196,85 @@ export default function ProductDetail() {
             {p.description && (
               <div className="mt-6 prose dark:prose-invert max-w-none" dangerouslySetInnerHTML={{ __html: p.description }} />
             )}
+
+            {/* Reviews */}
+            <div className="mt-8">
+              <h3 className="text-lg font-semibold">Customer reviews</h3>
+              <div className="mt-3 space-y-3">
+                {reviews.length === 0 && <div className="text-sm text-gray-500">No reviews yet</div>}
+                {reviews.map((r) => (
+                  <div key={r._id} className="p-3 border rounded bg-gray-50 dark:bg-gray-900">
+                    <div className="flex items-center justify-between">
+                      <div className="font-medium">{r.user?.name || 'User'}</div>
+                      <div className="flex items-center gap-3">
+                        <div className="text-sm text-amber-600">{'★'.repeat(r.rating)}{'☆'.repeat(5-r.rating)}</div>
+                        {(currentUser && (r.user?._id === currentUser._id || r.user?._id === currentUser.id)) && (
+                          <button title="Edit your review" className="p-1 rounded hover:bg-gray-100 dark:hover:bg-gray-800" onClick={() => {
+                            // open the review form in edit mode and prefill with this review
+                            setEditing(true);
+                            setMyRating(r.rating || 5);
+                            setMyComment(r.comment || '');
+                            // scroll to form
+                            setTimeout(() => { formRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' }); }, 50);
+                          }}>
+                            {/* pencil icon */}
+                            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-gray-600 dark:text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 4H6a2 2 0 00-2 2v12a2 2 0 002 2h12a2 2 0 002-2v-5m-7-7l7 7" />
+                            </svg>
+                          </button>
+                        )}
+                      </div>
+                    </div>
+                    {r.comment && <div className="mt-2 text-sm text-gray-700 dark:text-gray-300">{r.comment}</div>}
+                    <div className="mt-2 text-xs text-gray-400">{new Date(r.createdAt).toLocaleString()}</div>
+                  </div>
+                ))}
+              </div>
+
+              {/* Review form (show for eligible users or to edit an existing review) */}
+              {((canReview && !alreadyReviewed) || editing) && (
+                <div ref={formRef} className="mt-4 p-4 border rounded bg-white dark:bg-gray-900">
+                  <h4 className="font-semibold">{editing ? 'Edit your review' : 'Leave a review'}</h4>
+                  <div className="text-xs text-gray-500 mt-1">You may only submit one review per product; you can edit it later.</div>
+                  <div className="mt-2 flex items-center gap-2">
+                    <label className="text-sm">Rating:</label>
+                    <select value={myRating} onChange={(e)=>setMyRating(Number(e.target.value))} className="border rounded px-2 py-1">
+                      {[5,4,3,2,1].map((v)=> <option key={v} value={v}>{v} star{v>1?'s':''}</option>)}
+                    </select>
+                  </div>
+                  <div className="mt-2">
+                    <textarea value={myComment} onChange={(e)=>setMyComment(e.target.value)} placeholder="Write your comments (optional)" className="w-full border rounded p-2" rows={4} />
+                  </div>
+                  <div className="mt-2">
+                    <button className="px-3 py-1.5 bg-blue-600 text-white rounded" onClick={async ()=>{
+                      try {
+                        const body = { productId: id, rating: myRating, comment: myComment };
+                        await api.post('/reviews', body);
+                        // refresh reviews
+                        const rr = await api.get(`/reviews/${id}`);
+                        setReviews(rr.data || []);
+                        setAlreadyReviewed(true);
+                        setCanReview(false);
+                        setMyComment('');
+                      } catch (e) {
+                        alert(e?.response?.data?.message || 'Failed to submit review');
+                      }
+                    }}>Submit review</button>
+                  </div>
+                </div>
+              )}
+
+              {alreadyReviewed && !editing && (
+                <div className="mt-3 text-sm text-gray-500 flex items-center gap-3">
+                  <div>You have already reviewed this product.</div>
+                  <button className="text-sm text-blue-600 hover:underline" onClick={() => {
+                    // open edit form and scroll
+                    setEditing(true);
+                    setTimeout(() => { formRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' }); }, 50);
+                  }}>Edit your review</button>
+                </div>
+              )}
+            </div>
 
             {/* Variant selection */}
             <div className="mt-6 flex flex-col gap-4 text-sm">

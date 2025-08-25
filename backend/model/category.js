@@ -11,6 +11,13 @@ const categorySchema = new mongoose.Schema({
         type: String,
         trim: true
     },
+    // service charge percentage applied to products in this category (default 10%)
+    serviceCharge: {
+        type: Number,
+        default: 10,
+        min: 0,
+        max: 100
+    },
     createdAt: {
         type: Date,
         default: Date.now

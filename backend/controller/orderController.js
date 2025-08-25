@@ -1,5 +1,6 @@
 const Order = require('../model/order');
 const Product = require('../model/product');
+const Review = require('../model/review');
 
 const createOrder = async (req, res) => {
   try {
@@ -70,8 +71,28 @@ const getOrdersForUser = async (req, res) => {
         .limit(limit)
     ]);
 
+    // Annotate each item with product image/name and whether the current user already reviewed it
+    const ordersWithMeta = await Promise.all(orders.map(async (o) => {
+      const oObj = o.toObject ? o.toObject() : o;
+      oObj.items = await Promise.all((oObj.items || []).map(async (it) => {
+        const item = (it && it.toObject) ? it.toObject() : it;
+        const productId = item.product && item.product._id ? item.product._id : item.product;
+        // determine product metadata
+        const productImage = item.product && item.product.featuredImage ? item.product.featuredImage : null;
+        const productName = item.product && item.product.name ? item.product.name : (item.name || '');
+        // check if this user already reviewed this product
+        let hasReview = false;
+        if (productId) {
+          const rev = await Review.findOne({ product: productId, user: req.user._id });
+          hasReview = !!rev;
+        }
+        return Object.assign({}, item, { productImage, productName, hasReview });
+      }));
+      return oObj;
+    }));
+
     const totalPages = Math.ceil(total / limit) || 1;
-    res.json({ orders, total, page, limit, totalPages });
+    res.json({ orders: ordersWithMeta, total, page, limit, totalPages });
   } catch (error) {
     res.status(500).json({ message: 'Error fetching orders', error });
   }
