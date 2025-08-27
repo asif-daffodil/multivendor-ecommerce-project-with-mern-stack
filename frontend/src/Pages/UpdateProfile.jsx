@@ -6,7 +6,7 @@ import Swal from 'sweetalert2'
 import { useNavigate } from 'react-router'
 import useAuthStore from '../store/useAuthStore'
 
-const BASE = 'http://localhost:4000/user'
+const BASE = `${import.meta.env.VITE_API_BASE_URL}/user`
 
 const UpdateProfile = () => {
     const navigate = useNavigate()

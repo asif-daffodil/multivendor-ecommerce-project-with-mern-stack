@@ -41,7 +41,7 @@ const Navbar = () => {
         navigate('/');
     };
 
-    const API_BASE = 'http://localhost:4000'
+    const API_BASE = import.meta.env.VITE_API_BASE_URL;
     const resolveImage = (path) => {
         if (!path) return null
         if (path.startsWith('http://') || path.startsWith('https://')) return path

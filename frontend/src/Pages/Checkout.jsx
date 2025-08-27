@@ -69,7 +69,7 @@ const Checkout = () => {
         const order = createRes.data.order;
 
         // initiate SSLCommerz payment
-        const backendBase = (api.defaults && api.defaults.baseURL) ? api.defaults.baseURL : 'http://localhost:4000';
+  const backendBase = (api.defaults && api.defaults.baseURL) ? api.defaults.baseURL : import.meta.env.VITE_API_BASE_URL;
         const initPayload = {
           amount: order.total || payload.total,
           order_id: order._id,

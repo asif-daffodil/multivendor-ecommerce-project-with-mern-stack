@@ -52,7 +52,7 @@ const UserDashboard = () => {
                                                     <div className="space-y-2">
                                                         {o.items.map(it => (
                                                             <div key={it._id} className="flex items-center gap-3">
-                                                                <img src={it.productImage ? `http://localhost:4000/${it.productImage}` : '/hero-ecommerce.svg'} alt={it.productName} className="w-12 h-12 object-cover rounded" />
+                                                                <img src={it.productImage ? `${import.meta.env.VITE_API_BASE_URL}/${it.productImage}` : '/hero-ecommerce.svg'} alt={it.productName} className="w-12 h-12 object-cover rounded" />
                                                                 <div className="text-sm">
                                                                     <div className="font-medium">{it.productName}</div>
                                                                     <div className="text-xs text-gray-500">qty: {it.qty} • {'BDT '}{Number(it.price || 0).toFixed(2)}</div>

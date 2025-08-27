@@ -3,7 +3,7 @@ import useAuthStore from '../store/useAuthStore';
 
 // Create a shared axios instance
 const api = axios.create({
-  baseURL: 'http://localhost:4000',
+  baseURL: import.meta.env.VITE_API_BASE_URL,
 });
 
 // Attach token from Zustand on each request

@@ -22,7 +22,7 @@ const SignIn = () => {
     const mutation = useMutation({
         mutationFn: async (data) => {
             // Accept all statuses so we can handle 4xx without axios throwing
-            const res = await axios.post("http://localhost:4000/auth/login", data, { validateStatus: () => true });
+            const res = await axios.post(`${import.meta.env.VITE_API_BASE_URL}/auth/login`, data, { validateStatus: () => true });
             return res;
         },
         onSuccess: (res) => {
